@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xc:UDigSOSPlugin xmlns:xc="http://www.52n.org/schema/XMLConfigSchema">
+	<xc:SOS url="http://mars.uni-muenster.de:8080/OWS5SOS/sos">
+		<xc:Operation name="GetObservation">
+			<xc:Parameter id="procedure" omit="true">
+				<xc:Value>
+					urn:ogc:object:procedure:CITE:WeatherService:NYC
+				</xc:Value>
+			</xc:Parameter>
+			<xc:Parameter id="observedProperty">
+				<xc:Value>
+					urn:ogc:def:phenomenon:OGC:1.0.30:temperature
+				</xc:Value>
+			</xc:Parameter>
+			<xc:Parameter id="resultModel">
+				<xc:Value>om:Observation</xc:Value>
+			</xc:Parameter>
+			<xc:Parameter id="service">
+				<xc:Value>SOS</xc:Value>
+			</xc:Parameter>
+			<xc:Parameter id="responseMode">
+			<xc:Value>inline</xc:Value>
+			</xc:Parameter>
+			<xc:Parameter id="responseFormat">
+				<xc:Value>text/xml;subtype="OM/1.0.0"</xc:Value>
+			</xc:Parameter>
+		</xc:Operation>
+	</xc:SOS>
+</xc:UDigSOSPlugin>

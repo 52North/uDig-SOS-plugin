@@ -1,0 +1,7 @@
+
+
+- Spatial Operators not used in requests. 
+- Parameter BoundingBox is not used. This leads to some unnecessary requests. May be difficult to implement.
+- Requests with TimeInstants or TimePeriods have a max. accuracy of seconds, this needs to be changed in SOS and OXF
+- a lot of Strings are not externalized
+- SOSCapabilities reads not all information from SOS like provider and contact information  
