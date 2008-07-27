@@ -1,0 +1,8 @@
+<xb:config xmlns:xb="http://xml.apache.org/xmlbeans/2004/02/xbean/config"
+	xmlns:sos="http://www.52n.org/schema/XMLConfigSchema">
+
+  <!-- Namespaces to package mappings -->
+  <xb:namespace uri="http://52n.org/xsd/sosConfiguration">
+    <xb:package>org.52n.udig.sos.configuration</xb:package>
+  </xb:namespace>
+</xb:config>

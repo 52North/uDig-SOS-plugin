@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by geheim (nixda) -->
+<xs:schema xmlns:sos="http://www.52n.org/schema/XMLConfigSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.52n.org/schema/XMLConfigSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- Root Element-->
+	<xs:element name="UDigSOSPlugin">
+		<xs:annotation>
+			<xs:documentation>Rootelement of UDigSOSPlugin configuration. Contains general configuration and multiple SOS configurations</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:annotation>
+					<xs:documentation>Element contains configured SOS</xs:documentation>
+				</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Operation" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Operation element. Name of a configured SOS Operation. (i.e. GetObservation)</xs:documentation>
+							</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Parameter" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Parameterelement. Servicename of the Parameter (i.e. observationID)</xs:documentation>
+							</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Value" type="xs:string" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>String representation of the parameters value.</xs:documentation>
+							</xs:annotation>
+							</xs:element>
+												</xs:sequence>
+												<xs:attribute name="id" use="required"/>
+												<xs:attribute name="omit">
+							<xs:annotation>
+								<xs:documentation>Do not send parameter to SOS.</xs:documentation>
+							</xs:annotation>
+												
+</xs:attribute>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="name" use="required"/>
+									<xs:attribute name="showOperation"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="url" use="required"/>
+					</xs:complexType>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
