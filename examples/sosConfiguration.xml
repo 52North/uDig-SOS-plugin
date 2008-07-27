@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xc:UDigSOSPlugin
+	xmlns:xc="http://www.52n.org/schema/XMLConfigSchema">
+	<xc:SOS url="http://mars.uni-muenster.de:8080/OWS5SOS/sos">
+		<xc:Operation name="DescribeSensor" showOperation="false">
+			<xc:Parameter id="version" omit="true" />
+			<xc:Parameter id="service" />
+			<xc:Parameter id="outputFormat" omit="true" />
+		</xc:Operation>
+		<xc:Operation name="GetObservationById">
+			<xc:Parameter id="service">
+				<xc:Value>SOS</xc:Value>
+			</xc:Parameter>
+			<xc:Parameter id="outputFormat" omit="true" />
+		</xc:Operation>
+	</xc:SOS>
+</xc:UDigSOSPlugin>
