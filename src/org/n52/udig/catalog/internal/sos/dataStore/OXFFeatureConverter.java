@@ -48,18 +48,13 @@ import org.n52.oxf.feature.MeasureType;
 import org.n52.oxf.feature.OXFFeature;
 import org.n52.oxf.feature.OXFFeatureCollection;
 import org.n52.oxf.feature.OXFFeatureType;
-import org.n52.oxf.feature.OXFIQuantity;
-import org.n52.oxf.feature.OXFQuantity;
-import org.n52.oxf.feature.OXFQuantityRange;
 import org.n52.oxf.feature.PhenomenonPropertyType;
-import org.n52.oxf.feature.Quantity;
-import org.n52.oxf.feature.QuantityRange;
 import org.n52.oxf.feature.ScopedName;
 import org.n52.oxf.feature.dataTypes.OXFMeasureType;
 import org.n52.oxf.feature.dataTypes.OXFPhenomenonPropertyType;
 import org.n52.oxf.feature.dataTypes.OXFScopedName;
 import org.n52.oxf.util.LoggingHandler;
-import geoapi20.org.opengis.feature.FeatureAttributeDescriptor;;
+import org.opengis.feature.FeatureAttributeDescriptor;
 
 /**
  * A FeatureConverter for OXFFeatures and FeatureTypes. This class converts
@@ -112,7 +107,7 @@ public class OXFFeatureConverter {
 	public static Feature convert(final OXFFeature oxffeature)
 			throws IllegalAttributeException {
 		if (featureCache.containsKey(oxffeature)) {
-			LOGGER.debug("Feature already converted, using cached Version");
+//			LOGGER.debug("Feature already converted, using cached Version");
 			return featureCache.get(oxffeature);
 		}
 
@@ -243,22 +238,22 @@ public class OXFFeatureConverter {
 								f.setAttribute(j, new PhenomenonPropertyType(
 										oxfppt));
 							}
-						} else if (at.getType().isAssignableFrom(
-								IQuantity.class)) {
-							if (oxffeature.getFeatureType()
-									.getAttributeDescriptor(name)
-									.getObjectClass().isAssignableFrom(
-											OXFQuantityRange.class)) {
-								if (oxffeature.getAttribute(name) != null) {
-									final OXFQuantityRange oxfqr = ((OXFQuantityRange) oxffeature
-											.getAttribute(name));
-									f.setAttribute(j, new QuantityRange(oxfqr));
-								} else if (oxffeature.getAttribute(name) != null) {
-									final OXFQuantity oxfq = ((OXFQuantity) oxffeature
-											.getAttribute(name));
-									f.setAttribute(j, new Quantity(oxfq));
-								}
-							}
+//						} else if (at.getType().isAssignableFrom(
+//								IQuantity.class)) {
+//							if (oxffeature.getFeatureType()
+//									.getAttributeDescriptor(name)
+//									.getObjectClass().isAssignableFrom(
+//											OXFQuantityRange.class)) {
+//								if (oxffeature.getAttribute(name) != null) {
+//									final OXFQuantityRange oxfqr = ((OXFQuantityRange) oxffeature
+//											.getAttribute(name));
+//									f.setAttribute(j, new QuantityRange(oxfqr));
+//								} else if (oxffeature.getAttribute(name) != null) {
+//									final OXFQuantity oxfq = ((OXFQuantity) oxffeature
+//											.getAttribute(name));
+//									f.setAttribute(j, new Quantity(oxfq));
+//								}
+//							}
 						} else if (at.getType().isAssignableFrom(
 								com.vividsolutions.jts.geom.Geometry.class)) {
 							if (oxffeature.getAttribute(name) != null) {
@@ -339,11 +334,11 @@ public class OXFFeatureConverter {
 									.newAttributeType(oxffad.getName(),
 											PhenomenonPropertyType.class,
 											nillable));
-						} else if (oxffad.getObjectClass().isAssignableFrom(
-								OXFIQuantity.class)) {
-							build.addType(SOSAttributeTypeFactory
-									.newAttributeType(oxffad.getName(),
-											IQuantity.class, nillable));
+//						} else if (oxffad.getObjectClass().isAssignableFrom(
+//								OXFIQuantity.class)) {
+//							build.addType(SOSAttributeTypeFactory
+//									.newAttributeType(oxffad.getName(),
+//											IQuantity.class, nillable));
 						} else if (oxffad.getObjectClass().isAssignableFrom(
 								List.class)) {
 							build.addType(SOSAttributeTypeFactory

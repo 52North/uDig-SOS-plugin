@@ -29,7 +29,9 @@ package org.n52.oxf.feature;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import geoapi20.org.opengis.feature.FeatureAttributeDescriptor;
+import org.opengis.feature.FeatureAttributeDescriptor;
+
+
 
 import com.vividsolutions.jts.geom.Geometry;
 

@@ -32,6 +32,7 @@ import org.n52.oxf.OXFException;
 import org.n52.oxf.feature.IFeatureStore;
 import org.n52.oxf.feature.UDIGSOSFOIStore;
 import org.n52.oxf.feature.sos.UDIGSOSObservationStore;
+import org.n52.oxf.owsCommon.capabilities.Dataset;
 import org.n52.oxf.owsCommon.capabilities.Operation;
 import org.n52.oxf.owsCommon.capabilities.Parameter;
 import org.n52.oxf.serviceAdapters.ParameterContainer;
@@ -53,6 +54,7 @@ public class SOSOperationType extends OperationType {
 	private final String id;
 	private ParameterConfiguration initialParamConf;
 	private final ParameterConfiguration initialCapabilitiesParamConf;
+	
 
 	private final String url;
 
@@ -123,11 +125,13 @@ public class SOSOperationType extends OperationType {
 		}
 		return pc;
 	}
+	
+	
 
 	private static final Logger LOGGER = LoggingHandler
 			.getLogger(SOSOperationType.class);
 
-	public SOSOperationType(final String id, final String url) {
+	public SOSOperationType(final String id, final String url, org.n52.oxf.owsCommon.capabilities.Contents contents) {
 		this.id = id;
 		this.url = url;
 		initialParamConf = new ParameterConfiguration(id, url);
@@ -140,8 +144,8 @@ public class SOSOperationType extends OperationType {
 				// this should never happen
 				LOGGER.fatal(e);
 			}
-
 		}
+		setContents(contents);
 	}
 
 	public String getInfo() {
@@ -204,13 +208,18 @@ public class SOSOperationType extends OperationType {
 		return out;
 
 	}
+	
+	public void setContents(org.n52.oxf.owsCommon.capabilities.Contents contents){
+		initialCapabilitiesParamConf.setContents(contents);
+		initialParamConf.setContents(contents);
+	}
 
 	public void addParameterFromCaps(final Parameter parameter)
 			throws OXFException {
 		initialCapabilitiesParamConf.addParameter(parameter);
 		initialParamConf.addParameter(parameter);
 	}
-
+	
 	public IFeatureStore getFeatureStore() {
 		if (id.equals(SOSOperations.opName_GetObservation)
 				|| id.equals(SOSOperations.opName_GetObservationById)) {

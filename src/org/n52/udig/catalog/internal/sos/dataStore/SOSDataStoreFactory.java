@@ -199,7 +199,7 @@ public class SOSDataStoreFactory extends AbstractDataStoreFactory {
 					&& params.get(SOSDataStoreFactory.PARAMETERS.key) != null) {
 				if (params.get(SOSDataStoreFactory.PARAMETERS.key).getClass()
 						.isAssignableFrom(String.class)) {
-					LOGGER.warn(params.get(SOSDataStoreFactory.PARAMETERS.key));
+					LOGGER.debug(params.get(SOSDataStoreFactory.PARAMETERS.key));
 					params.put(SOSDataStoreFactory.PARAMETERS.key,
 							new ParameterConfiguration((String) params
 									.get(SOSDataStoreFactory.PARAMETERS.key)));

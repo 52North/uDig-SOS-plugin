@@ -64,13 +64,14 @@ import org.n52.oxf.serviceAdapters.sos.SOSAdapter;
 import org.n52.oxf.util.LoggingHandler;
 import org.n52.udig.catalog.internal.sos.dataStore.config.GeneralConfigurationRegistry;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSOperationType;
-import geoapi20.org.opengis.metadata.citation.Address;
-import geoapi20.org.opengis.metadata.citation.Contact;
-import geoapi20.org.opengis.metadata.citation.OnLineResource;
-import geoapi20.org.opengis.metadata.citation.ResponsibleParty;
-import geoapi20.org.opengis.metadata.citation.Role;
-import geoapi20.org.opengis.metadata.citation.Telephone;
-import geoapi20.org.opengis.util.InternationalString;
+import org.opengis.metadata.citation.Address;
+import org.opengis.metadata.citation.Contact;
+import org.opengis.metadata.citation.OnLineResource;
+import org.opengis.metadata.citation.ResponsibleParty;
+import org.opengis.metadata.citation.Role;
+import org.opengis.metadata.citation.Telephone;
+import org.opengis.util.InternationalString;
+
 
 class CapabilitiesCreator implements Callable<OperationResult> {
 	private final SOSAdapter adapter;
@@ -146,9 +147,10 @@ public class SOSCapabilities extends Capabilities {
 			final Operation op[] = oxfService.getOperationsMetadata()
 					.getOperations();
 			// check all available operations
+			
 			for (final Operation element : op) {
 				final SOSOperationType opType = new SOSOperationType(element
-						.getName(), serviceURL.toExternalForm());
+						.getName(), serviceURL.toExternalForm(), oxfService.getContents());
 				opType.getFormats();
 
 				// all operations have DCP-Elements
@@ -183,6 +185,7 @@ public class SOSCapabilities extends Capabilities {
 						for (final Parameter parameter : parameters) {
 							opType.addParameterFromCaps(parameter);
 						}
+
 						if (element.getName().equals(
 								SOSOperations.opName_GetCapabilities)) {
 							operations.setGetCapabilities(opType);
@@ -792,6 +795,9 @@ public class SOSCapabilities extends Capabilities {
 				// TODO what about other codes?
 				if (crs.contains("EPSG:")) {
 					crs = crs.substring(crs.indexOf("EPSG:"));
+					if (crs.equals("EPSG:0")){
+						crs = "EPSG:4326";
+					}
 				}
 
 				try {

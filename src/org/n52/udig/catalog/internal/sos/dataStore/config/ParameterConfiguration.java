@@ -41,6 +41,8 @@ import org.n52.oxf.owsCommon.capabilities.IValueDomain;
 import org.n52.oxf.owsCommon.capabilities.Parameter;
 import org.n52.oxf.serviceAdapters.ParameterContainer;
 import org.n52.oxf.serviceAdapters.ParameterShell;
+import org.n52.oxf.serviceAdapters.sos.SOSAdapter;
+import org.n52.oxf.serviceAdapters.sos.caps.ObservationOffering;
 import org.n52.oxf.util.LoggingHandler;
 import org.n52.oxf.valueDomains.StringValueDomain;
 import org.n52.oxf.valueDomains.time.TemporalValueDomain;
@@ -94,6 +96,44 @@ public class ParameterConfiguration implements Serializable {
 	// static private HashMap<String, Character> parameterType = new
 	// HashMap<String, Character>();
 
+	private org.n52.oxf.owsCommon.capabilities.Contents contents = null;
+
+	public ParameterConfiguration(final ParameterConfiguration p) {
+		this.operationId = p.getOperationId();
+		this.url = p.getUrl();
+		this.setContents(p.getContents());
+		this.paramCon = new ParameterContainer();
+
+		for (final ParameterShell ps : p.getConfiguredParameterContainer()
+				.getParameterShells()) {
+			ParameterShell psneu = null;
+			try {
+				if (ps.hasMultipleSpecifiedValues()) {
+					psneu = new ParameterShell(ps.getParameter(), ps
+							.getSpecifiedValueArray());
+				} else {
+					psneu = new ParameterShell(ps.getParameter(), ps
+							.getSpecifiedValue());
+				}
+			} catch (final Exception e) {
+				LOGGER.error(e);
+			}
+			this.paramCon.addParameterShell(psneu);
+		}
+
+		this.optionalParameters = new ArrayList<Parameter>();
+		for (final Parameter p1 : p.getOptionalParameters()) {
+			optionalParameters.add(new Parameter(p1.getServiceSidedName(), p1
+					.isRequired(), p1.getValueDomain(), p1.getCommonName()));
+		}
+
+		this.requiredParameters = new ArrayList<Parameter>();
+		for (final Parameter p1 : p.getRequiredParameters()) {
+			requiredParameters.add(new Parameter(p1.getServiceSidedName(), p1
+					.isRequired(), p1.getValueDomain(), p1.getCommonName()));
+		}
+	}
+	
 	/**
 	 * Creates a new Instance of ParameterConfiguration
 	 * 
@@ -108,6 +148,54 @@ public class ParameterConfiguration implements Serializable {
 
 		this.operationId = operation;
 		this.url = url;
+	}
+	
+	private boolean isContained(String[] inOffering, String[] configured){
+		List<String> inOfferingList = new Vector<String>();
+		for (int i = 0; i < inOffering.length; i++) {
+			inOfferingList.add(inOffering[i]);
+		}
+		
+		for (int j = 0; j < configured.length; j++) {
+			String configuredObservedProperty = configured[j];
+			if (!inOfferingList.contains(configuredObservedProperty)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean offeringCheck(String s, String[] configuredprocedures, String[] configuredObservedProperties, String[] configuredFOIs){
+		// TODO there are more possibillities
+		ObservationOffering dataset = (ObservationOffering)contents.getDataIdentification(s);
+		
+		
+		// check contents for observedproperties
+		if (configuredObservedProperties!= null){
+			String[] observedpropertiesInOffering = dataset.getObservedProperties();
+			if (!isContained(observedpropertiesInOffering, configuredObservedProperties)){
+				return false;
+			}
+		}
+		
+		
+		// check contents for FOIs
+		if (configuredFOIs!= null){
+			String[] fOIs = dataset.getFeatureOfInterest();
+			if (!isContained(fOIs, configuredFOIs)){
+				return false;
+			}
+		}
+		
+		// check contents for procedures
+		if (configuredprocedures!= null){
+			String[] procedures = dataset.getProcedures();
+			if (!isContained(procedures, configuredprocedures)){
+				return false;
+			}
+		}
+		
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -133,6 +221,24 @@ public class ParameterConfiguration implements Serializable {
 		else if (operationId.equals(SOSOperations.opName_GetObservation)) {
 			l = ((IDiscreteValueDomain) getParameterByID("offering")
 					.getValueDomain()).getPossibleValues();
+			
+			// take care, not every offering works with every procedure
+			String[] configuredprocedures = (String[])paramCon.getParameterShellWithCommonName("procedure").getSpecifiedValueArray();
+			String[] configuredObservedProperties = (String[])paramCon.getParameterShellWithCommonName("observedProperty").getSpecifiedValueArray();
+			String[] configuredFOI = null;
+//			String[] configuredFOI = (String[])paramCon.getParameterShellWithCommonName("featureOfInterest").getSpecifiedValueArray();
+			List<String> removeOfferings = new Vector<String>();
+			
+			for (String s : l){
+				if (!offeringCheck(s, configuredprocedures, configuredObservedProperties, configuredFOI)){
+					removeOfferings.add(s);
+				}
+			}
+			
+			for (String s:removeOfferings){
+				l.remove(s);
+			}
+
 			// typeNames = new String[l.size()];
 			// for (int i = 0; i < l.size(); i++) {
 			// typeNames[i] = l.get(i);
@@ -202,41 +308,6 @@ public class ParameterConfiguration implements Serializable {
 	}
 
 	String selectedObservationID = "";
-
-	public ParameterConfiguration(final ParameterConfiguration p) {
-		this.operationId = p.getOperationId();
-		this.url = p.getUrl();
-		this.paramCon = new ParameterContainer();
-
-		for (final ParameterShell ps : p.getConfiguredParameterContainer()
-				.getParameterShells()) {
-			ParameterShell psneu = null;
-			try {
-				if (ps.hasMultipleSpecifiedValues()) {
-					psneu = new ParameterShell(ps.getParameter(), ps
-							.getSpecifiedValueArray());
-				} else {
-					psneu = new ParameterShell(ps.getParameter(), ps
-							.getSpecifiedValue());
-				}
-			} catch (final Exception e) {
-				LOGGER.error(e);
-			}
-			this.paramCon.addParameterShell(psneu);
-		}
-
-		this.optionalParameters = new ArrayList<Parameter>();
-		for (final Parameter p1 : p.getOptionalParameters()) {
-			optionalParameters.add(new Parameter(p1.getServiceSidedName(), p1
-					.isRequired(), p1.getValueDomain(), p1.getCommonName()));
-		}
-
-		this.requiredParameters = new ArrayList<Parameter>();
-		for (final Parameter p1 : p.getRequiredParameters()) {
-			requiredParameters.add(new Parameter(p1.getServiceSidedName(), p1
-					.isRequired(), p1.getValueDomain(), p1.getCommonName()));
-		}
-	}
 
 	/**
 	 * Adds a new parameter to the lists of optional parameters.
@@ -685,6 +756,14 @@ public class ParameterConfiguration implements Serializable {
 		return null;
 	}
 
+	public void setContents(org.n52.oxf.owsCommon.capabilities.Contents contentss){
+		this.contents = contentss;
+	}
+	
+	public org.n52.oxf.owsCommon.capabilities.Contents getContents(){
+		return this.contents;
+	}
+	
 	/**
 	 * Sets the value of a parameter to values[]
 	 * 
