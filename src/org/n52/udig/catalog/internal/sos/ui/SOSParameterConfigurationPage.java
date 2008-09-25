@@ -631,8 +631,6 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 	private void operationChanged() {
 		try {
-
-
 			paramConf = identifyOperation().getNewPreconfiguredConfiguration();
 			// this is a good time to configure the
 			// operation with SOSConfigurationRegistry
