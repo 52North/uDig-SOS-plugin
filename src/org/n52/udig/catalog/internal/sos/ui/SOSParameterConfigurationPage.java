@@ -99,7 +99,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	SOSSelectOperationPage prevPage;
 
 	private final Spinner[] spin1 = new Spinner[6];
-	
+
 	private final Spinner[] spin2 = new Spinner[6];
 
 	Composite timebox;
@@ -107,8 +107,8 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	public SOSParameterConfigurationPage() {
 		this("ParameterConfiguration");
 	}
-	
-	
+
+
 	/**
 	 * @param pageName
 	 */
@@ -118,20 +118,20 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		super
 				.setDescription("left: Select your parameters; right parametervalues; next button is disabled untli all parameters are configured");
 	}
-	
+
 	private String changedOfferingComboBox(){
 		String error = null;
 		try {
 			error = paramConf.setParameterValue("offering", offeringComboBox.getItem(offeringComboBox.getSelectionIndex()));
 			populateOperation();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOGGER.error("An error occured while selecting an offering");
 			error = e.getMessage();
 		}
-		
+
 		return error;
 	}
-	
+
 	private String changedParameterValueViewer() {
 		String error = "";
 		try {
@@ -168,10 +168,10 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 		return error;
 	}
-	
+
 	private void changedParameterViewer() {
 		parameterValueViewer.removeAll();
-		
+
 		// try {
 		final String parameterS = identifySelectedParameter();
 		if (parameterS == null || parameterS.trim().equals("")
@@ -183,13 +183,13 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 		IDiscreteValueDomain<String> idvd = null;
 
-		org.n52.oxf.owsCommon.capabilities.Parameter pbID = paramConf.getParameterByID(parameterS);
+		final org.n52.oxf.owsCommon.capabilities.Parameter pbID = paramConf.getParameterByID(parameterS);
 
 		final List<String> selectedValues = new LinkedList<String>();
 
 		int i = 0;
 
-		
+
 
 		if (pbID != null) {
 			if (pbID.getValueDomain() instanceof TemporalValueDomain) {
@@ -244,10 +244,10 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 			// check if a Parameter needs to be checked in Viewer
 			if (pbID.getValueDomain() instanceof StringValueDomain) {
-				ParameterShell ps = paramConf.getConfiguredParameterContainer()
+				final ParameterShell ps = paramConf.getConfiguredParameterContainer()
 				.getParameterShellWithServiceSidedName(
 						pbID.getServiceSidedName());
-				
+
 				if (ps != null) {
 					if (ps.hasMultipleSpecifiedValues()) {
 						for (final Object o : ps.getSpecifiedValueArray()) {
@@ -263,18 +263,34 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 					i = 0;
 					parameterValueViewer.setItemCount(idvd.getPossibleValues().size());
 					String s = null;
-					String offeringS = identifySelectedOffering();
-					for (final Object o : idvd.getPossibleValues()) {
-						s = (String) o;
-						if (paramConf.isValueAllowedInOffering(s, offeringS)){
-							if (selectedValues.contains(s)) {
-								parameterValueViewer.getItem(i).setChecked(true);
+
+					if (identifyOperation().getId().equals(SOSOperations.opName_GetObservation)){
+						final String offeringS = identifySelectedOffering();
+						for (final Object o : idvd.getPossibleValues()) {
+							s = (String) o;
+							if (paramConf.isValueAllowedInOffering(s, offeringS)){
+								if (selectedValues.contains(s)) {
+									parameterValueViewer.getItem(i).setChecked(true);
+								} else {
+									parameterValueViewer.getItem(i).setChecked(false);
+								}
+								parameterValueViewer.getItem(i++).setText(s);
 							} else {
-								parameterValueViewer.getItem(i).setChecked(false);
+								parameterValueViewer.setItemCount(parameterValueViewer.getItemCount()-1);
+							}
+						}
+					} else{
+						for (final Object o : idvd.getPossibleValues()) {
+							s = (String) o;
+							if (selectedValues.contains(s)) {
+								parameterValueViewer.getItem(i)
+										.setChecked(true);
+							} else {
+								parameterValueViewer.getItem(i).setChecked(
+										false);
 							}
 							parameterValueViewer.getItem(i++).setText(s);
-						} else {
-							parameterValueViewer.setItemCount(parameterValueViewer.getItemCount()-1);
+
 						}
 					}
 				}
@@ -296,7 +312,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		final Composite composite2 = new Composite(composite1, SWT.NULL);
 		composite2.setLayout(new GridLayout(1, true));
 		composite2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-		
+
 		final Composite composite = new Composite(composite1, SWT.NULL);
 		composite.setLayout(new GridLayout(2, false));
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -310,16 +326,16 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		getTimeViewer(composite1);
 		getDescriptionViewer(composite1);
 		setControl(composite1);
-		
+
 //		if (!identifyOperation().equals("GetObservation")){
 //			composite2.setVisible(false);
 //		}
-		
+
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createControl(final Composite arg0) {
@@ -365,7 +381,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 				| SWT.H_SCROLL);
 		offeringTextViewer.getControl().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
-		
+
 //		offeringTextViewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 //				false));
 //		offeringTextViewer.addSelectionListener(this);
@@ -377,7 +393,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 				false));
 		offeringComboBox.addSelectionListener(this);
 		offeringComboBox.setVisible(false);
-		
+
 	}
 
 	private void getParameterValueViewer(final Composite composite) {
@@ -396,7 +412,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see net.refractions.udig.catalog.ui.UDIGConnectionPage#getParams()
 	 */
 	public Map<String, Serializable> getParams() {
@@ -546,7 +562,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	}
 
 	private String identifySelectedParameter() {
-		if (parameterViewer.getSelection() != null && parameterViewer.getSelectionCount() > 0 
+		if (parameterViewer.getSelection() != null && parameterViewer.getSelectionCount() > 0
 				&& parameterViewer.getSelection()[0] != null) {
 			if (parameterViewer.getSelection()[0].getItemCount() == 0) {
 				return parameterViewer.getSelection()[0].getText();
@@ -554,15 +570,14 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		}
 
 		return null;
-		// if itemCount == 0 we have a parameterid
 	}
-	
+
 	public void init() {
 		prevPage = ((SOSSelectOperationPage) getPreviousPage());
 		// ((SOSSelectOperationPage)getPreviousPage()).getParameters() =
 		// ((SOSSelectOperationPage) getPreviousPage()).getParameters();
 	}
-	
+
 	@Override
 	public boolean isPageComplete() {
 		if (dirtyBit) {
@@ -613,11 +628,11 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 			}
 		}
 	}
-	
+
 	private void operationChanged() {
 		try {
-			
-			
+
+
 			paramConf = identifyOperation().getNewPreconfiguredConfiguration();
 			// this is a good time to configure the
 			// operation with SOSConfigurationRegistry
@@ -637,7 +652,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 			LOGGER.error(e);
 			// e.printStackTrace();
 		}
-		
+
 		if (getParams().get(SOSDataStoreFactory.OPERATION.key).equals(
 				SOSOperations.opName_GetObservation)) {
 			offeringComboBox.setVisible(true);
@@ -659,37 +674,37 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		} else{
 			populateOperation();
 		}
-		
+
 
 		dirtyBit = false;
 	}
 
 	protected void populateOffering(){
 		offeringComboBox.removeAll();
-		
-		SOSOperationType sosopType = identifyOperation();		
-		
-		List<String> offerings = sosopType.getCapabilitiesConfiguration().getOfferingsFromContents();
-		for (String s : offerings){
+
+		final SOSOperationType sosopType = identifyOperation();
+
+		final List<String> offerings = sosopType.getCapabilitiesConfiguration().getOfferingsFromContents();
+		for (final String s : offerings){
 			offeringComboBox.add(s);
 		}
 //		populateOperation();
 	}
 
 	protected void populateOperation() {
-		
+
 		parameterViewer.removeAll();
 		parameterValueViewer.removeAll();
 		parameterViewer.setItemCount(2);
 
-		SOSOperationType sosopType = identifyOperation();
-		
+		final SOSOperationType sosopType = identifyOperation();
+
 		final List<String> lReq = new LinkedList<String>();
 
 		int i = 0;
 		List<String> listReq = null;
-		
-		
+
+
 		if (sosopType.getId().equals(SOSOperations.opName_GetObservation)){
 			listReq = paramConf.getUnconfiguredRequiredParametersAsStringsForOffering(identifySelectedOffering());
 		} else{
@@ -718,11 +733,11 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		for (final String s : lReq) {
 			parameterViewer.getItem(0).getItem(i++).setText(s);
 		}
-		
+
 
 		List<String> listOpt = null;
 		final List<String> lOpt = new LinkedList<String>();
-		
+
 		if (sosopType.getId().equals(SOSOperations.opName_GetObservation)){
 			listOpt = paramConf.getUnconfiguredOptionalParametersAsStringsForOffering(identifySelectedOffering());
 		} else{
@@ -782,7 +797,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 				final List<ITime> possibleValues = tvd.getPossibleValues();
 
 				String text = "";
-				
+
 				for (final ITime t : possibleValues) {
 					text += (t.toString());
 				}
