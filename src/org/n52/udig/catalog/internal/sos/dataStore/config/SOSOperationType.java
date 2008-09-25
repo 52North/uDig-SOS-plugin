@@ -32,7 +32,6 @@ import org.n52.oxf.OXFException;
 import org.n52.oxf.feature.IFeatureStore;
 import org.n52.oxf.feature.UDIGSOSFOIStore;
 import org.n52.oxf.feature.sos.UDIGSOSObservationStore;
-import org.n52.oxf.owsCommon.capabilities.Dataset;
 import org.n52.oxf.owsCommon.capabilities.Operation;
 import org.n52.oxf.owsCommon.capabilities.Parameter;
 import org.n52.oxf.serviceAdapters.ParameterContainer;
@@ -54,9 +53,7 @@ public class SOSOperationType extends OperationType {
 	private final String id;
 	private ParameterConfiguration initialParamConf;
 	private final ParameterConfiguration initialCapabilitiesParamConf;
-	
 
-	private final String url;
 
 	/**
 	 * This method fixes a few errors known in the 52N-SOS, this may lead to
@@ -133,7 +130,7 @@ public class SOSOperationType extends OperationType {
 
 	public SOSOperationType(final String id, final String url, org.n52.oxf.owsCommon.capabilities.Contents contents) {
 		this.id = id;
-		this.url = url;
+//		this.url = url;
 		initialParamConf = new ParameterConfiguration(id, url);
 		initialCapabilitiesParamConf = new ParameterConfiguration(id, url);
 		if (id.equals(SOSOperations.opName_GetObservationById)) {

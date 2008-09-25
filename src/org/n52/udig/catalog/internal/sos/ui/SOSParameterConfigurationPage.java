@@ -94,7 +94,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 	private Tree parameterViewer;
 
-	private SOSSelectOperationPage prevPage;
+//	private SOSSelectOperationPage prevPage;
 
 	private final Spinner[] spin1 = new Spinner[6];
 
@@ -569,7 +569,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	}
 
 	public void init() {
-		prevPage = ((SOSSelectOperationPage) getPreviousPage());
+//		prevPage = ((SOSSelectOperationPage) getPreviousPage());
 		// ((SOSSelectOperationPage)getPreviousPage()).getParameters() =
 		// ((SOSSelectOperationPage) getPreviousPage()).getParameters();
 	}

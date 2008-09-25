@@ -57,10 +57,7 @@ public class SOSDataStore extends AbstractDataStore {
 	 * the Sensor Observation Service
 	 */
 	private SOSAdapter adapter = null;
-	/**
-	 * The SOSCapabilities for the current DataStore
-	 */
-	private final SOSCapabilities capabilities;
+	
 	/**
 	 * the SOS service version
 	 * 
@@ -83,12 +80,12 @@ public class SOSDataStore extends AbstractDataStore {
 	 */
 	private long lastUpdated;
 
-	private SOSDataStore() throws IOException {
-		super(false);
-		capabilities = SOSDataStoreFactory.getInstance()
-				.getCapabilities(params);
-		// generateCapabilities();
-	}
+//	private SOSDataStore() throws IOException {
+//		super(false);
+//		capabilities = SOSDataStoreFactory.getInstance()
+//				.getCapabilities(params);
+//		// generateCapabilities();
+//	}
 
 	/**
 	 * Returns the OXF-SOS-Serviceadapter used for connections of this datastore
@@ -99,19 +96,19 @@ public class SOSDataStore extends AbstractDataStore {
 		return adapter;
 	}
 
-	/**
-	 * 
-	 * @param isWriteable
-	 */
-	// XXX this cannot work; where are the params from?
-	private SOSDataStore(final boolean isWriteable) throws IOException {
-		super(isWriteable);
-		capabilities = SOSDataStoreFactory.getInstance()
-				.getCapabilities(params);
-		adapter = new SOSAdapter((String) params
-				.get(SOSDataStoreFactory.SERVICE_VERSION.key));
-		lastUpdated = System.currentTimeMillis();
-	}
+//	/**
+//	 * 
+//	 * @param isWriteable
+//	 */
+//	// XXX this cannot work; where are the params from?
+//	private SOSDataStore(final boolean isWriteable) throws IOException {
+//		super(isWriteable);
+//		capabilities = SOSDataStoreFactory.getInstance()
+//				.getCapabilities(params);
+//		adapter = new SOSAdapter((String) params
+//				.get(SOSDataStoreFactory.SERVICE_VERSION.key));
+//		lastUpdated = System.currentTimeMillis();
+//	}
 
 	/**
 	 * Creates a new instance of {@link SOSDataStore}. Called by
@@ -140,8 +137,8 @@ public class SOSDataStore extends AbstractDataStore {
 					.get(SOSDataStoreFactory.SERVICE_VERSION.key);
 		}
 		adapter = new SOSAdapter(serviceVersion);
-		capabilities = SOSDataStoreFactory.getInstance()
-				.getCapabilities(params);
+//		capabilities = SOSDataStoreFactory.getInstance()
+//				.getCapabilities(params);
 		lastUpdated = System.currentTimeMillis();
 	}
 

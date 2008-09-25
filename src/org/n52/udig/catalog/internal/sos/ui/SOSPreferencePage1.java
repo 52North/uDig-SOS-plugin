@@ -99,7 +99,7 @@ public class SOSPreferencePage1 extends PreferencePage implements
 	private static final Logger LOGGER = LoggingHandler
 			.getLogger(SOSPreferencePage1.class);
 	private final String placeholderString1 = "                                   ";
-	private final String placeholderString2 = "                                                                              ";
+//	private final String placeholderString2 = "                                                                              ";
 	private final String placeholderString3 = "                                                                 ";
 	private Tree tree;
 	private Tree valueTree;

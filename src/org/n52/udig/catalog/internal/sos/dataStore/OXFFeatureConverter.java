@@ -43,7 +43,6 @@ import org.geotools.feature.sos.SOSAttributeTypeFactory;
 import org.geotools.feature.sos.SOSFeatureCollections;
 import org.geotools.feature.sos.SOSFeatureTypeBuilder;
 import org.n52.oxf.feature.GenericObservationParser;
-import org.n52.oxf.feature.IQuantity;
 import org.n52.oxf.feature.MeasureType;
 import org.n52.oxf.feature.OXFFeature;
 import org.n52.oxf.feature.OXFFeatureCollection;

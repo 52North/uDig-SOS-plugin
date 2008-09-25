@@ -31,7 +31,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.DefaultAttributeType;
-import org.geotools.feature.Feature;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.filter.Filter;
 import org.n52.oxf.feature.Duplicatable;
@@ -61,6 +60,7 @@ public class SOSAttributeType extends DefaultAttributeType {
 	 * @param nillable
 	 * @param defaultValue
 	 */
+	@SuppressWarnings("unchecked")
 	public SOSAttributeType(final String name, final Class type,
 			final boolean nillable, final Object defaultValue) {
 		super(name, type, nillable, defaultValue);
@@ -74,6 +74,7 @@ public class SOSAttributeType extends DefaultAttributeType {
 	 * @param max
 	 * @param defaultValue
 	 */
+	@SuppressWarnings("unchecked")
 	public SOSAttributeType(final String name, final Class type,
 			final boolean nillable, final int min, final int max,
 			final Object defaultValue) {

@@ -73,7 +73,7 @@ public class SOSFeatureType implements FeatureType {
 	 * by DefaultFeature
 	 */
 	final int defaultGeomIdx;
-
+	@SuppressWarnings("unchecked")
 	public SOSFeatureType(final String typeName, final String namespace,
 			final Collection types, final Collection superTypes,
 			final GeometryAttributeType defaultGeom) throws SchemaException,
@@ -104,6 +104,7 @@ public class SOSFeatureType implements FeatureType {
 	 * @throws NullPointerException
 	 *             If typeName is null.
 	 */
+	@SuppressWarnings("unchecked")
 	public SOSFeatureType(final String typeName, final URI namespace,
 			final Collection types, final Collection superTypes,
 			final GeometryAttributeType defaultGeom)

@@ -96,6 +96,7 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	 * Implementation of AttributeType creation.
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected AttributeType createAttributeType(final String name,
 			final Class clazz, final boolean isNillable, final int fieldLength,
 			final Object defaultValue) {
@@ -121,6 +122,7 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	/**
 	 * Implementation of AttributeType creation.
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	protected AttributeType createAttributeType(final String name,
 			final Class clazz, final boolean isNillable, final Filter filter,
@@ -166,6 +168,7 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	 * 
 	 * @return A new AttributeType of name, clazz and isNillable.
 	 */
+	@SuppressWarnings("unchecked")
 	public static AttributeType newAttributeType(final String name,
 			final Class clazz, final boolean isNillable, final int fieldLength,
 			final Object defaultValue) {
@@ -209,6 +212,7 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	 * @return the newly created AttributeType
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected AttributeType createAttributeType(final String name,
 			final Class clazz, final boolean isNillable, final int fieldLength) {
 
@@ -216,6 +220,7 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected AttributeType createAttributeType(final String name,
 			final Class clazz, final boolean isNillable, final int fieldLength,
 			final Object defaultValue, final Object metaData) {
@@ -257,13 +262,14 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	 * @param metaData
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static AttributeType newAttributeType(final String name,
 			final Class clazz, final boolean isNillable, final int fieldLength,
 			final Object defaultValue, final Object metaData) {
 		return defaultInstance().createAttributeType(name, clazz, isNillable,
 				fieldLength, defaultValue, metaData);
 	}
-
+	@SuppressWarnings("unchecked")
 	public static AttributeType newAttributeType(final String name,
 			final Class clazz, final boolean isNillable,
 			final Filter restriction, final Object defaultValue,
@@ -285,6 +291,7 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	 * 
 	 * @return A new AttributeType of name, clazz and isNillable.
 	 */
+	@SuppressWarnings("unchecked")
 	public static AttributeType newAttributeType(final String name,
 			final Class clazz, final boolean isNillable, final int fieldLength) {
 		return defaultInstance().createAttributeType(name, clazz, isNillable,
@@ -304,6 +311,7 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	 * 
 	 * @return A new AttributeType of name, clazz and isNillable.
 	 */
+	@SuppressWarnings("unchecked")
 	public static AttributeType newAttributeType(final String name,
 			final Class clazz, final boolean isNillable) {
 		return defaultInstance().createAttributeType(name, clazz, isNillable,
@@ -321,6 +329,7 @@ public class SOSAttributeTypeFactory extends DefaultAttributeTypeFactory {
 	 * 
 	 * @return A new AttributeType of name and clazz.
 	 */
+	@SuppressWarnings("unchecked")
 	public static AttributeType newAttributeType(final String name,
 			final Class clazz) {
 		return newAttributeType(name, clazz, true);

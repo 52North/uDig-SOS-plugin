@@ -81,11 +81,12 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @param FeatureType
 	 *            optional, may be null
 	 */
+	@SuppressWarnings("unchecked")
 	protected SOSFeatureCollection(final String id, FeatureType featureType) {
 		super(id, featureType);
 		this.id = id;
 		if (featureType == null) {
-			final List ats = new LinkedList();
+			final List<FeatureAttributeType> ats = new LinkedList<FeatureAttributeType>();
 			ats.add(new FeatureAttributeType("_Feature", new SOSFeatureType(
 					"AbstractFeatureType", GMLSchema.NAMESPACE,
 					new LinkedList(), new LinkedList(), null), false));
@@ -100,6 +101,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	private FeatureType childType;
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public FeatureType getSchema() {
 		if (childType == null) {
 			// no children guess Features are okay then
@@ -116,6 +118,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 *         collection.
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Envelope getBounds() {
 		if (bounds == null) {
 			bounds = new Envelope();
@@ -140,6 +143,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 *            The listener to add
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void addListener(final CollectionListener listener) {
 		listeners.add(listener);
 	}
@@ -175,6 +179,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void fireChange(final Collection coll, final int type) {
 		Feature[] features = new Feature[coll.size()];
 		features = (Feature[]) coll.toArray(features);
@@ -216,6 +221,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected boolean add(final Feature feature, final boolean fire) {
 
 		// This cast is neccessary to keep with the contract of Set!
@@ -265,6 +271,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @see #add(Object)
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean addAll(final Collection collection) {
 		// TODO check inheritance with FeatureType here!!!
 		boolean changed = false;
@@ -300,6 +307,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * an exception.
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void clear() {
 		if (contents.isEmpty()) {
 			return;
@@ -347,6 +355,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @return true if collection is completly covered
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean containsAll(final Collection collection) {
 		final Iterator iterator = collection.iterator();
 		try {
@@ -383,6 +392,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @return an <tt>Iterator</tt> over the elements in this collection
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Iterator iterator() {
 		final Iterator iterator = contents.values().iterator();
 
@@ -461,14 +471,15 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @see #remove(Object)
 	 * @see #contains(Object)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean removeAll(final Collection collection) {
 		boolean changed = false;
-		final Iterator iterator = collection.iterator();
+		final Iterator<Feature> iterator = collection.iterator();
 		try {
-			final List removedFeatures = new ArrayList(collection.size());
+			final List<Feature> removedFeatures = new ArrayList<Feature>(collection.size());
 			while (iterator.hasNext()) {
-				final Feature f = (Feature) iterator.next();
+				final Feature f = iterator.next();
 				final boolean removed = contents.values().remove(f);
 
 				if (removed) {
@@ -504,14 +515,15 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @see #remove(Object)
 	 * @see #contains(Object)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean retainAll(final Collection collection) {
-		final List removedFeatures = new ArrayList(contents.size()
+		final List<Feature> removedFeatures = new ArrayList<Feature>(contents.size()
 				- collection.size());
 		boolean modified = false;
 
-		for (final Iterator it = contents.values().iterator(); it.hasNext();) {
-			final Feature f = (Feature) it.next();
+		for (final Iterator<Feature> it = contents.values().iterator(); it.hasNext();) {
+			final Feature f = it.next();
 			if (!collection.contains(f)) {
 				it.remove();
 				modified = true;
@@ -614,6 +626,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * 
 	 * @return an array containing the elements of this collection
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object[] toArray(final Object[] a) {
 		return contents.values().toArray(a);
@@ -707,18 +720,19 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * 
 	 * @see org.geotools.feature.Feature#setAttribute(int, java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void setAttribute(final int position, final Object val)
 			throws IllegalAttributeException, ArrayIndexOutOfBoundsException {
 		if (position == 0 && val instanceof List) {
-			final List nw = (List) val;
+			final List<Feature> nw = (List<Feature>) val;
 			if (!FeatureState.isFeatures(nw)) {
 				return;
 			}
 
 			contents.clear();
-			for (final Iterator i = nw.iterator(); i.hasNext();) {
-				final Feature feature = (Feature) i.next();
+			for (final Iterator<Feature> i = nw.iterator(); i.hasNext();) {
+				final Feature feature = i.next();
 				feature.setParent(this);
 				contents.put(feature.getID(), feature);
 			}
@@ -784,6 +798,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void close(final Iterator close) {
 		// nop
 	}
@@ -820,7 +835,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	public FeatureCollection collection() throws IOException {
 		final FeatureCollection copy = new SOSFeatureCollection(null,
 				featureType);
-		final List list = new ArrayList(contents.size());
+		final List<Feature> list = new ArrayList<Feature>(contents.size());
 		for (final FeatureIterator iterator = features(); iterator.hasNext();) {
 			final Feature feature = iterator.next();
 			Feature duplicate;
@@ -843,6 +858,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @return Set of fids.
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Set fids() {
 		return Collections.unmodifiableSet(contents.keySet());
 	}
@@ -853,6 +869,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @throws IOException
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void accepts(final FeatureVisitor visitor, ProgressListener progress)
 			throws IOException {
 		Iterator iterator = null;
@@ -944,6 +961,7 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	 * @return FeatureList sorted according to provided order
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public FeatureList sort(final SortBy2 order) {
 		final Comparator compare;
 		if (order == SortBy.NATURAL_ORDER) {

@@ -29,7 +29,6 @@ package org.n52.udig.catalog.internal.sos.dataStore;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;

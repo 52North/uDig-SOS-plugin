@@ -213,6 +213,8 @@ public class SOSDataStoreFactory extends AbstractDataStoreFactory {
 	// public static final String serviceVersion = serviceVersion_100;
 	private final HashMap<Map<String, Serializable>, SOSDataStore> dsCache = new HashMap<Map<String, Serializable>, SOSDataStore>();
 
+	private Map params;
+
 	// Map<URL, List<String>> supportedVersionsCache = new HashMap<URL,
 	// List<String>>();
 

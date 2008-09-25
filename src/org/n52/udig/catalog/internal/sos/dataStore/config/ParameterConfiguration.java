@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -753,6 +752,7 @@ public class ParameterConfiguration implements Serializable {
 	 * @return
 	 * @deprecated
 	 */
+	@Deprecated
 	private boolean isContained(String[] inOffering, String[] configured){
 		List<String> inOfferingList = new Vector<String>();
 		for (int i = 0; i < inOffering.length; i++) {
