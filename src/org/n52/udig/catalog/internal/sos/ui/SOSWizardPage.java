@@ -171,7 +171,10 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 
 		String[] temp = settings.getArray(SOS_RECENTLY_USED_ID);
 		if (temp == null) {
-			temp = new String[0];
+			// fallback
+			temp = new String[2];
+			temp[0] = "";
+			temp[1] = "http://v-swe.uni-muenster.de:8080/HWS-SOS/sos";
 		}
 
 		final List<String> recent = Arrays.asList(temp);

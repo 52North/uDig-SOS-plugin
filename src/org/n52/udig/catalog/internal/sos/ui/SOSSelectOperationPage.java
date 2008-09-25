@@ -53,6 +53,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.geotools.data.DataStore;
 import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStore;
 import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStoreFactory;
+import org.n52.udig.catalog.internal.sos.dataStore.SOSOperations;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSConfigurationRegistry;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSOperationType;
 
@@ -176,10 +177,13 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 				}
 			}
 			final String filteredOperationsArray[] = new String[filteredOperations
-					.size()];
+					.size()-1];
 			int i = 0;
 			for (final String s : filteredOperations) {
-				filteredOperationsArray[i++] = s;
+				// take care I reduced arraysize
+				if (!s.equals(SOSOperations.opName_GetCapabilities)){
+					filteredOperationsArray[i++] = s;
+				}
 			}
 			operationIdViewer.setInput(filteredOperationsArray);
 
