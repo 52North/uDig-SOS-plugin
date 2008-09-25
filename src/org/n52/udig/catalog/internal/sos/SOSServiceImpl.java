@@ -29,6 +29,7 @@ package org.n52.udig.catalog.internal.sos;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -76,8 +77,17 @@ public class SOSServiceImpl extends IService {
 	private volatile UDIGSOSDataStore ds = null;
 	private static final Logger LOGGER = LoggingHandler
 			.getLogger(SOSServiceImpl.class);
+	private static HashMap<Map<String, Serializable>, SOSServiceImpl> cache = new HashMap<Map<String,Serializable>, SOSServiceImpl>();
 
-	public SOSServiceImpl(URL url, final Map<String, Serializable> params) {
+	public static SOSServiceImpl getInstance(URL url, final Map<String, Serializable> params) {
+		if (!cache.containsKey(params)){
+			cache.put(params, new SOSServiceImpl(url, params));
+		}
+		return cache.get(params);
+	}
+	
+	private SOSServiceImpl(URL url, final Map<String, Serializable> params) {
+		
 		if (url == null) {
 			url = (URL) params.get(SOSDataStoreFactory.URL_SERVICE.key);
 		}
@@ -180,6 +190,12 @@ public class SOSServiceImpl extends IService {
 	 * @see net.refractions.udig.catalog.IResolve#getIdentifier()
 	 */
 	public URL getIdentifier() {
+//		Random r = new Random(); 
+		try {
+			return new URL(url.toExternalForm()+"@"+params.hashCode());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return url;
 	}
 

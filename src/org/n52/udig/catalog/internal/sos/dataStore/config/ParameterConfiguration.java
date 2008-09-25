@@ -550,8 +550,9 @@ public class ParameterConfiguration implements Serializable {
 //			l = ((IDiscreteValueDomain) getParameterByID("offering")
 //					.getValueDomain()).getPossibleValues();
 			l = new LinkedList<String>();
-			Random r = new Random();
-			String typeName = (String)paramCon.getParameterShellWithCommonName("offering").getSpecifiedValue()+"#"+r.nextInt(); 
+//			Random r = new Random();
+//			String typeName = (String)paramCon.getParameterShellWithCommonName("offering").getSpecifiedValue()+"#"+r.nextInt();
+			String typeName = (String)paramCon.getParameterShellWithCommonName("offering").getSpecifiedValue();
 			l.add(typeName);
 			
 			// TODO this will be deprecated

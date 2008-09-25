@@ -192,13 +192,16 @@ public class SOSServiceExtension extends AbstractDataStoreServiceExtension
 
 		if (id == null) {
 			try {
-				return new SOSServiceImpl((URL) (params
+				return SOSServiceImpl.getInstance((URL) (params
 						.get(SOSDataStoreFactory.URL_SERVICE.key)), params);
+//				return new SOSServiceImpl((URL) (params
+//						.get(SOSDataStoreFactory.URL_SERVICE.key)), params);
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
-		return new SOSServiceImpl(id, params);
+		return SOSServiceImpl.getInstance(id, params);
+//		return new SOSServiceImpl(id, params);
 	}
 
 	@Override
