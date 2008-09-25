@@ -252,19 +252,19 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		}
 	}
 
-	/**
-	 * @return the dataStore
-	 */
-	public DataStore getDataStore() {
-		// .createDatastore uses a cache,
-		try {
-			return SOSDataStoreFactory.getInstance().createDataStore(
-					getParameters());
-		} catch (final IOException ioe) {
-			LOGGER.fatal("Error creating datastore", ioe);
-		}
-		return null;
-	}
+//	/**
+//	 * @return the dataStore
+//	 */
+//	public DataStore getDataStore() {
+//		// .createDatastore uses a cache,
+//		try {
+//			return SOSDataStoreFactory.getInstance().createDataStore(
+//					getParameters());
+//		} catch (final IOException ioe) {
+//			LOGGER.fatal("Error creating datastore", ioe);
+//		}
+//		return null;
+//	}
 
 	protected Map<String, Serializable> getParameters() {
 		if (urlCombo == null) {
@@ -429,8 +429,12 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 				final StyledText t = new StyledText(xmlViewer, SWT.MULTI
 						| SWT.V_SCROLL | SWT.H_SCROLL);
 				try {
-					t.setText(((UDIGSOSDataStore) getDataStore())
-							.getCapabilities().getCapabilitiesString());
+// TODO use browser instead 
+					t.setText(SOSDataStoreFactory.getInstance().getCapabilities(
+							(URL)params.get(SOSDataStoreFactory.URL_SERVICE.key), 
+							(String)params.get(SOSDataStoreFactory.SERVICE_VERSION.key)).getCapabilitiesString());
+//					t.setText(((UDIGSOSDataStore) getDataStore())
+//							.getCapabilities().getCapabilitiesString());
 				} catch (final IOException ie) {
 					LOGGER.error(ie);
 					setErrorMessage(ie.getMessage());
