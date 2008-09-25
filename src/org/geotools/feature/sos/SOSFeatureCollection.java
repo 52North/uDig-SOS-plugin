@@ -269,11 +269,11 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 		// TODO check inheritance with FeatureType here!!!
 		boolean changed = false;
 
-		final Iterator iterator = collection.iterator();
+		final Iterator<Feature> iterator = collection.iterator();
 		try {
-			final List featuresAdded = new ArrayList(collection.size());
+			final List<Feature> featuresAdded = new ArrayList<Feature>(collection.size());
 			while (iterator.hasNext()) {
-				final Feature f = (Feature) iterator.next();
+				final Feature f = iterator.next();
 				final boolean added = add(f, false);
 				changed |= added;
 
@@ -386,14 +386,14 @@ public class SOSFeatureCollection extends DefaultFeatureCollection {
 	public Iterator iterator() {
 		final Iterator iterator = contents.values().iterator();
 
-		return new Iterator() {
+		return new Iterator<Feature>() {
 			Feature currFeature = null;
 
 			public boolean hasNext() {
 				return iterator.hasNext();
 			}
 
-			public Object next() {
+			public Feature next() {
 				currFeature = (Feature) iterator.next();
 				return currFeature;
 			}

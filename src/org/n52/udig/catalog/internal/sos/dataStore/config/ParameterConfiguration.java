@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -41,7 +42,6 @@ import org.n52.oxf.owsCommon.capabilities.IValueDomain;
 import org.n52.oxf.owsCommon.capabilities.Parameter;
 import org.n52.oxf.serviceAdapters.ParameterContainer;
 import org.n52.oxf.serviceAdapters.ParameterShell;
-import org.n52.oxf.serviceAdapters.sos.SOSAdapter;
 import org.n52.oxf.serviceAdapters.sos.caps.ObservationOffering;
 import org.n52.oxf.util.LoggingHandler;
 import org.n52.oxf.valueDomains.StringValueDomain;
@@ -60,6 +60,36 @@ import org.n52.udig.catalog.internal.sos.dataStore.SOSOperations;
 public class ParameterConfiguration implements Serializable {
 
 	/**
+	 * the Log4j-logger, configured with {@link GeneralConfigurationRegistry}
+	 */
+	private static final Logger LOGGER = LoggingHandler
+			.getLogger(ParameterConfiguration.class);
+
+	public static void main(final String[] args) {
+		try {
+			final ParameterConfiguration pc = new ParameterConfiguration(
+					"doof", "url");
+			pc.addRequiredParameter(new Parameter("1", false,
+					new StringValueDomain(), "1"));
+			pc.setParameterValue("1", "erg1");
+			pc.addOptionalParameter(new Parameter("2", false,
+					new StringValueDomain(), "1"));
+			pc.setParameterValue("2", "erg2");
+			System.out.println(pc);
+			System.out.println(new ParameterConfiguration(pc.toString()));
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private org.n52.oxf.owsCommon.capabilities.Contents contents = null;
+
+	private final String entryEND = "@";
+
+	private final String lineEND = "\n";
+
+	/**
 	 * The ID of the operation configured with this class
 	 * 
 	 * @see SOSOperations
@@ -67,36 +97,32 @@ public class ParameterConfiguration implements Serializable {
 	 */
 	private String operationId;
 
+	// static private HashMap<String, Character> parameterType = new
+	// HashMap<String, Character>();
+
 	/**
 	 * A list with all optinalParameters
 	 */
 	private List<Parameter> optionalParameters = new Vector<Parameter>();
 
 	/**
-	 * A list with all requiredParameters
-	 */
-	private List<Parameter> requiredParameters = new Vector<Parameter>();
-
-	/**
 	 * The parameter container that will be send to the OXFFramework
 	 */
 	private ParameterContainer paramCon = new ParameterContainer();
+	
+	/**
+	 * A list with all requiredParameters
+	 */
+	private List<Parameter> requiredParameters = new Vector<Parameter>();
+	
+	String selectedObservationID = "";
+
+	private String[] typeNames = null;
 
 	/**
 	 * The url of the sos
 	 */
 	private String url;
-
-	/**
-	 * the Log4j-logger, configured with {@link GeneralConfigurationRegistry}
-	 */
-	private static final Logger LOGGER = LoggingHandler
-			.getLogger(ParameterConfiguration.class);
-
-	// static private HashMap<String, Character> parameterType = new
-	// HashMap<String, Character>();
-
-	private org.n52.oxf.owsCommon.capabilities.Contents contents = null;
 
 	public ParameterConfiguration(final ParameterConfiguration p) {
 		this.operationId = p.getOperationId();
@@ -133,7 +159,54 @@ public class ParameterConfiguration implements Serializable {
 					.isRequired(), p1.getValueDomain(), p1.getCommonName()));
 		}
 	}
-	
+
+	/**
+	 * Creates a new instance of {@link ParameterConfiguration} UDig saves map
+	 * and layer connection parameters as Strings. So use this constructor to
+	 * create a new instance of {@link ParameterConfiguration} from the string
+	 * representation created by {@link ParameterConfiguration}{@link #toString()}
+	 * the values are not crosschecked with Capabilities
+	 * 
+	 * @param classRepresentation
+	 */
+	public ParameterConfiguration(final String classRepresentation) {
+		try {
+
+			final String[] cr = classRepresentation.split("\n");
+			if (cr.length > 2) {
+				for (final String s : cr) {
+					if (s.contains(("opID"))) {
+						operationId = s.substring(s.indexOf("opID") + 5, s
+								.length() - 1);
+					} else if (s.contains("url")) {
+						url = s.substring(s.indexOf("url") + 4, s.length() - 1);
+					} else {
+						final String[] s2 = s.split(entryEND);
+						final String name = s2[0];
+						if (s2.length > 2) {
+							final String[] values = new String[s2.length - 1];
+							for (int i = 1; i < s2.length; i++) {
+								values[i - 1] = s2[i];
+							}
+							addParameter(new Parameter(name, false,
+									new StringValueDomain(), name));
+							setParameterValue(name, values);
+						} else {
+							addParameter(new Parameter(name, false,
+									new StringValueDomain(), name));
+							setParameterValue(name, s2[1]);
+							// paramCon.addParameterShell(name, s2[1]);
+						}
+					}
+				}
+			}
+		} catch (final Exception e) {
+			LOGGER.fatal("Could not load parameters", e);
+		}
+		// } else throw new Exception("was los=!");
+
+	}
+
 	/**
 	 * Creates a new Instance of ParameterConfiguration
 	 * 
@@ -149,165 +222,6 @@ public class ParameterConfiguration implements Serializable {
 		this.operationId = operation;
 		this.url = url;
 	}
-	
-	private boolean isContained(String[] inOffering, String[] configured){
-		List<String> inOfferingList = new Vector<String>();
-		for (int i = 0; i < inOffering.length; i++) {
-			inOfferingList.add(inOffering[i]);
-		}
-		
-		for (int j = 0; j < configured.length; j++) {
-			String configuredObservedProperty = configured[j];
-			if (!inOfferingList.contains(configuredObservedProperty)){
-				return false;
-			}
-		}
-		return true;
-	}
-	
-	private boolean offeringCheck(String s, String[] configuredprocedures, String[] configuredObservedProperties, String[] configuredFOIs){
-		// TODO there are more possibillities
-		ObservationOffering dataset = (ObservationOffering)contents.getDataIdentification(s);
-		
-		
-		// check contents for observedproperties
-		if (configuredObservedProperties!= null){
-			String[] observedpropertiesInOffering = dataset.getObservedProperties();
-			if (!isContained(observedpropertiesInOffering, configuredObservedProperties)){
-				return false;
-			}
-		}
-		
-		
-		// check contents for FOIs
-		if (configuredFOIs!= null){
-			String[] fOIs = dataset.getFeatureOfInterest();
-			if (!isContained(fOIs, configuredFOIs)){
-				return false;
-			}
-		}
-		
-		// check contents for procedures
-		if (configuredprocedures!= null){
-			String[] procedures = dataset.getProcedures();
-			if (!isContained(procedures, configuredprocedures)){
-				return false;
-			}
-		}
-		
-		return true;
-	}
-
-	@SuppressWarnings("unchecked")
-	public String[] getTypeNames() {
-		if (typeNames != null
-				&& !operationId.equals(SOSOperations.opName_GetObservationById)) {
-			return typeNames;
-		}
-		List<String> l = null;
-		// TODO tuning needed
-
-		// featureofinterest
-		if (operationId.equals(SOSOperations.opName_GetFeatureOfInterest)) {
-			l = ((IDiscreteValueDomain) getParameterByID("featureOfInterestId")
-					.getValueDomain()).getPossibleValues();
-			// typeNames = new String[l.size()];
-			// for (int i = 0; i < l.size(); i++) {
-			// typeNames[i] = l.get(i);
-			// }
-			// return typeNames;
-		}
-		// ask for offerings
-		else if (operationId.equals(SOSOperations.opName_GetObservation)) {
-			l = ((IDiscreteValueDomain) getParameterByID("offering")
-					.getValueDomain()).getPossibleValues();
-			
-			// take care, not every offering works with every procedure
-			String[] configuredprocedures = (String[])paramCon.getParameterShellWithCommonName("procedure").getSpecifiedValueArray();
-			String[] configuredObservedProperties = (String[])paramCon.getParameterShellWithCommonName("observedProperty").getSpecifiedValueArray();
-			String[] configuredFOI = null;
-//			String[] configuredFOI = (String[])paramCon.getParameterShellWithCommonName("featureOfInterest").getSpecifiedValueArray();
-			List<String> removeOfferings = new Vector<String>();
-			
-			for (String s : l){
-				if (!offeringCheck(s, configuredprocedures, configuredObservedProperties, configuredFOI)){
-					removeOfferings.add(s);
-				}
-			}
-			
-			for (String s:removeOfferings){
-				l.remove(s);
-			}
-
-			// typeNames = new String[l.size()];
-			// for (int i = 0; i < l.size(); i++) {
-			// typeNames[i] = l.get(i);
-			// }
-			// typeNames = new String[offerings.size()];
-			//
-			// for (int i = 0; i < offerings.size(); i++) {
-			// typeNames[i] = offerings.get(i).getIdentifier();
-			// }
-			// return typeNames;
-		} else if (operationId.equals(SOSOperations.opName_DescribeSensor)) {
-			l = ((IDiscreteValueDomain) getParameterByID("procedure")
-					.getValueDomain()).getPossibleValues();
-			// typeNames = new String[l.size()];
-			// for (int i = 0; i < l.size(); i++) {
-			// typeNames[i] = l.get(i);
-			// }
-			// return typeNames;
-		} else if (operationId.equals(SOSOperations.opName_GetCapabilities)) {
-			return null;
-		} else if (operationId.equals(SOSOperations.opName_GetObservationById)) {
-			// XXX this won`t work
-			LOGGER
-					.info("SETTING OF HEART GetObservationById NOT SUPPORTED, because SOS offers no list with all available featureids");
-			// getParameterByID()
-
-			l = new LinkedList<String>();
-			l.add((String) paramCon.getParameterShellWithServiceSidedName(
-					"ObservationId").getSpecifiedValue());
-		}
-		if (l != null) {
-			typeNames = new String[l.size()];
-			for (int i = 0; i < l.size(); i++) {
-				typeNames[i] = l.get(i);
-			}
-			return typeNames;
-		}
-		return null;
-	}
-
-	private String[] typeNames = null;
-
-	public String getHeartParameterName() {
-		if (operationId.equals("GetFeatureOfInterest")) {
-			return "featureOfInterestId";
-		} else if (operationId.equals("GetObservation")) {
-			return "offering";
-		} else if (operationId.equals("DescribeSensor")) {
-			return "procedure";
-		} else if (operationId.equals("GetCapabilities")) {
-
-		} else if (operationId.equals("GetObservationById")) {
-			return "ObservationId";
-		}
-		return null;
-	}
-
-	public void setHeartParameter(final ParameterConfiguration pc,
-			final String typename) throws OXFException {
-		// initialParamConf.setParameter(getHeartParameterName(), typename);
-		pc.setParameterValue(getHeartParameterName(), typename);
-
-		// WORKAROUND
-		if (getHeartParameterName().equals("ObservationId")) {
-			selectedObservationID = typename;
-		}
-	}
-
-	String selectedObservationID = "";
 
 	/**
 	 * Adds a new parameter to the lists of optional parameters.
@@ -319,8 +233,8 @@ public class ParameterConfiguration implements Serializable {
 	@Deprecated
 	private void addOptionalParameter(final Parameter parameter)
 			throws OXFException {
-		if (requiredParameters.contains(parameter)) {
-			requiredParameters.remove(parameter);
+		if (optionalParameters.contains(parameter)) {
+			optionalParameters.remove(parameter);
 		}
 		optionalParameters.add(parameter);
 		configureParameter(parameter);
@@ -364,6 +278,12 @@ public class ParameterConfiguration implements Serializable {
 		configureParameter(parameter);
 	}
 
+	private void addToList(String[] sArray, List<String> l){
+		for (int i = 0; i < sArray.length; i++) {
+			l.add(sArray[i]);
+		}
+	}
+
 	/**
 	 * Preconfigures a given parameter. If only one value is possible and the
 	 * parameter is required, to value will be autoset.
@@ -390,6 +310,16 @@ public class ParameterConfiguration implements Serializable {
 		} else {
 			if (parameter.isRequired()) {
 				if (parameter.getValueDomain() instanceof IDiscreteValueDomain) {
+					if (parameter.getServiceSidedName().equals("responseMode")){
+						setParameterValue(parameter
+								.getServiceSidedName(),
+								"inline");
+					}
+					else if (parameter.getServiceSidedName().equals("responseFormat")){
+						setParameterValue(parameter
+								.getServiceSidedName(),
+								"text/xml;subtype=\"OM/1.0.0\"");
+					} else{
 					// System.out.println("VD.
 					// :"+parameter.getValueDomain().getDomainDescription());
 
@@ -400,8 +330,7 @@ public class ParameterConfiguration implements Serializable {
 					// if only one value is allowed, configure the parameter
 					// according to it
 					if (temp_param_domain.getPossibleValues().size() == 1) {
-						LOGGER
-								.debug("only a single value allowed for parameter \""
+						LOGGER.debug("only a single value allowed for parameter \""
 										+ parameter.getServiceSidedName()
 										+ "\": autoset to "
 										+ temp_param_domain.getPossibleValues()
@@ -442,6 +371,7 @@ public class ParameterConfiguration implements Serializable {
 						// parameter, temp_param_domain
 						// .getPossibleValues().get(0)));
 					}
+					}
 				}
 			}
 		}
@@ -456,6 +386,47 @@ public class ParameterConfiguration implements Serializable {
 		return paramCon;
 	}
 
+	public org.n52.oxf.owsCommon.capabilities.Contents getContents(){
+		return this.contents;
+	}
+
+	public String getHeartParameterName() {
+		if (operationId.equals("GetFeatureOfInterest")) {
+			return "featureOfInterestId";
+		} else if (operationId.equals("GetObservation")) {
+			return "offering";
+		} else if (operationId.equals("DescribeSensor")) {
+			return "procedure";
+		} else if (operationId.equals("GetCapabilities")) {
+
+		} else if (operationId.equals("GetObservationById")) {
+			return "ObservationId";
+		}
+		return null;
+	}
+
+	private List<String> getOfferingItems(String offeringS){
+		ObservationOffering offering = (ObservationOffering)contents.getDataIdentification(offeringS);
+		List<String> l = new Vector<String>();
+		addToList(offering.getAvailableCRSs(), l);
+		addToList(offering.getFeatureOfInterest(), l);
+		addToList(offering.getObservedProperties(), l);
+		addToList(offering.getOutputFormats(), l);
+		addToList(offering.getProcedures(), l);
+		addToList(offering.getResponseModes(), l);
+		addToList(offering.getResultModels(), l);
+
+		return l;
+	}
+
+	public List<String> getOfferingsFromContents(){
+		List<String> returnList = new Vector<String>();
+		for (int i = 0; i < contents.getDataIdentificationCount(); i++) {
+			returnList.add(contents.getDataIdentification(i).getIdentifier());
+		}
+		return returnList;
+	}
+	
 	/**
 	 * Returns the operation's Service-ID this {@link ParameterConfiguration} is
 	 * assigned to
@@ -466,6 +437,8 @@ public class ParameterConfiguration implements Serializable {
 	public String getOperationId() {
 		return operationId;
 	}
+	
+	
 
 	/**
 	 * Returns a list of all optional Parameters.
@@ -505,6 +478,15 @@ public class ParameterConfiguration implements Serializable {
 		return null;
 	}
 
+	public List<Parameter> getParameters() {
+		final List<Parameter> out = new Vector<Parameter>(requiredParameters
+				.size()
+				+ optionalParameters.size());
+		out.addAll(getRequiredParameters());
+		out.addAll(getOptionalParameters());
+		return out;
+	}
+
 	/**
 	 * Returns a list of all (optional and required) Parameters as Strings with
 	 * serviceSidedName.
@@ -517,15 +499,6 @@ public class ParameterConfiguration implements Serializable {
 				+ optionalParameters.size());
 		out.addAll(getRequiredParametersAsStrings());
 		out.addAll(getOptionalParametersAsStrings());
-		return out;
-	}
-
-	public List<Parameter> getParameters() {
-		final List<Parameter> out = new Vector<Parameter>(requiredParameters
-				.size()
-				+ optionalParameters.size());
-		out.addAll(getRequiredParameters());
-		out.addAll(getOptionalParameters());
 		return out;
 	}
 
@@ -553,6 +526,74 @@ public class ParameterConfiguration implements Serializable {
 		return out;
 	}
 
+	@SuppressWarnings("unchecked")
+	public String[] getTypeNames() {
+		if (typeNames != null
+				&& !operationId.equals(SOSOperations.opName_GetObservationById)) {
+			return typeNames;
+		}
+		List<String> l = null;
+		// TODO tuning needed
+
+		// featureofinterest
+		if (operationId.equals(SOSOperations.opName_GetFeatureOfInterest)) {
+			l = ((IDiscreteValueDomain) getParameterByID("featureOfInterestId")
+					.getValueDomain()).getPossibleValues();
+			// typeNames = new String[l.size()];
+			// for (int i = 0; i < l.size(); i++) {
+			// typeNames[i] = l.get(i);
+			// }
+			// return typeNames;
+		}
+		// ask for offerings
+		else if (operationId.equals(SOSOperations.opName_GetObservation)) {
+//			l = ((IDiscreteValueDomain) getParameterByID("offering")
+//					.getValueDomain()).getPossibleValues();
+			l = new LinkedList<String>();
+			Random r = new Random();
+			String typeName = (String)paramCon.getParameterShellWithCommonName("offering").getSpecifiedValue()+"#"+r.nextInt(); 
+			l.add(typeName);
+			
+			// TODO this will be deprecated
+			// take care, not every offering works with every procedure
+//			String[] configuredprocedures = (String[])paramCon.getParameterShellWithCommonName("procedure").getSpecifiedValueArray();
+//			String[] configuredObservedProperties = (String[])paramCon.getParameterShellWithCommonName("observedProperty").getSpecifiedValueArray();
+//			String[] configuredFOI = null;
+////			String[] configuredFOI = (String[])paramCon.getParameterShellWithCommonName("featureOfInterest").getSpecifiedValueArray();
+//			List<String> removeOfferings = new Vector<String>();
+//			
+//			for (String s : l){
+//				if (!offeringCheck(s, configuredprocedures, configuredObservedProperties, configuredFOI)){
+//					removeOfferings.add(s);
+//				}
+//			}
+//			
+//			for (String s:removeOfferings){
+//				l.remove(s);
+//			}
+		} else if (operationId.equals(SOSOperations.opName_DescribeSensor)) {
+			l = ((IDiscreteValueDomain) getParameterByID("procedure")
+					.getValueDomain()).getPossibleValues();
+		} else if (operationId.equals(SOSOperations.opName_GetCapabilities)) {
+			return null;
+		} else if (operationId.equals(SOSOperations.opName_GetObservationById)) {
+			// XXX this won`t work
+			LOGGER
+					.info("SETTING OF HEART GetObservationById NOT SUPPORTED, because SOS offers no list with all available featureids");
+			l = new LinkedList<String>();
+			l.add((String) paramCon.getParameterShellWithServiceSidedName(
+					"ObservationId").getSpecifiedValue());
+		}
+		if (l != null) {
+			typeNames = new String[l.size()];
+			for (int i = 0; i < l.size(); i++) {
+				typeNames[i] = l.get(i);
+			}
+			return typeNames;
+		}
+		return null;
+	}
+
 	/**
 	 * Returns a list of all unconfigured (parameters with no value set)
 	 * optional Parameters.
@@ -569,7 +610,7 @@ public class ParameterConfiguration implements Serializable {
 		}
 		return out;
 	}
-
+	
 	/**
 	 * Returns a list of all unconfigured (parameters with no value set)
 	 * optional Parameters.
@@ -590,7 +631,28 @@ public class ParameterConfiguration implements Serializable {
 		}
 		return out;
 	}
+	
+	public List<String> getUnconfiguredOptionalParametersAsStringsForOffering(String offeringS) {
+		List<String> l = getOfferingItems(offeringS);
 
+		final List<String> out = new Vector<String>();
+		for (final Parameter param : getUnconfiguredOptionalParameters()) {
+			// XXX WORKAROUND!
+			if (!param.getServiceSidedName().equalsIgnoreCase("bbox")
+					&& !param.getServiceSidedName().equalsIgnoreCase(
+							"EventTime")) {
+				boolean added = false;
+				for (Object o:((IDiscreteValueDomain)param.getValueDomain()).getPossibleValues()){
+					if (!added && l.contains(o)){
+						added = true;
+						out.add(param.getServiceSidedName());
+					}
+				}
+			}
+		}
+		return out;
+	}
+	
 	/**
 	 * Returns a list of all unconfigured (parameters with no value set)
 	 * required Parameters.
@@ -607,6 +669,60 @@ public class ParameterConfiguration implements Serializable {
 			}
 		}
 		return out;
+	}
+	
+	/**
+	 * Returns a list of all unconfigured (parameters with no value set)
+	 * required Parameters.
+	 * 
+	 * @return a list of all unconfigured required Parameters as List<String>
+	 * @see Parameter#getServiceSidedName()
+	 */
+	public List<String> getUnconfiguredRequiredParametersAsStrings() {
+		final List<String> out = new Vector<String>();
+		for (final Parameter param : getUnconfiguredRequiredParameters()) {
+			// XXX WORKAROUND!
+			if (!param.getServiceSidedName().equalsIgnoreCase("bbox")
+					&& !param.getServiceSidedName().equalsIgnoreCase(
+							"EventTime")) {
+				out.add(param.getServiceSidedName());
+			}
+		}
+		return out;
+	}
+	
+	
+
+	public List<String> getUnconfiguredRequiredParametersAsStringsForOffering(String offeringS) {
+		List<String> l = getOfferingItems(offeringS);
+		
+		l.addAll(((IDiscreteValueDomain)getParameterByID("resultModel").getValueDomain()).getPossibleValues());
+		
+		final List<String> out = new Vector<String>();
+		for (final Parameter param : getUnconfiguredRequiredParameters()) {
+			// XXX WORKAROUND!
+			if (!param.getServiceSidedName().equalsIgnoreCase("bbox")
+					&& !param.getServiceSidedName().equalsIgnoreCase(
+							"EventTime")) {
+				boolean added = false;
+				for (Object o:((IDiscreteValueDomain)param.getValueDomain()).getPossibleValues()){
+					if (!added && l.contains(o)){
+						added = true;
+						out.add(param.getServiceSidedName());
+					}
+				}
+			}
+		}
+		return out;
+	}
+
+	/**
+	 * Returns the url of the used SOS
+	 * 
+	 * @return the url as {@link String}
+	 */
+	public String getUrl() {
+		return url;
 	}
 
 	/**
@@ -630,32 +746,25 @@ public class ParameterConfiguration implements Serializable {
 	}
 
 	/**
-	 * Returns a list of all unconfigured (parameters with no value set)
-	 * required Parameters.
-	 * 
-	 * @return a list of all unconfigured required Parameters as List<String>
-	 * @see Parameter#getServiceSidedName()
+	 * Checks if Strings in configured are contained in inOffering. Used to check if a given ParameterSet can be used for special Offerings
+	 * @param inOffering
+	 * @param configured
+	 * @return
+	 * @deprecated
 	 */
-	public List<String> getUnconfiguredRequiredParametersAsStrings() {
-		final List<String> out = new Vector<String>();
-		for (final Parameter param : getUnconfiguredRequiredParameters()) {
-			// XXX WORKAROUND!
-			if (!param.getServiceSidedName().equalsIgnoreCase("bbox")
-					&& !param.getServiceSidedName().equalsIgnoreCase(
-							"EventTime")) {
-				out.add(param.getServiceSidedName());
+	private boolean isContained(String[] inOffering, String[] configured){
+		List<String> inOfferingList = new Vector<String>();
+		for (int i = 0; i < inOffering.length; i++) {
+			inOfferingList.add(inOffering[i]);
+		}
+		
+		for (int j = 0; j < configured.length; j++) {
+			String configuredObservedProperty = configured[j];
+			if (!inOfferingList.contains(configuredObservedProperty)){
+				return false;
 			}
 		}
-		return out;
-	}
-
-	/**
-	 * Returns the url of the used SOS
-	 * 
-	 * @return the url as {@link String}
-	 */
-	public String getUrl() {
-		return url;
+		return true;
 	}
 
 	/**
@@ -672,6 +781,76 @@ public class ParameterConfiguration implements Serializable {
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean isValueAllowedInOffering(String value, String offeringS){
+		ObservationOffering offering = (ObservationOffering)contents.getDataIdentification(offeringS);
+		
+		boolean returnbool = false;
+		
+		List<String> l = new LinkedList<String>();
+		l.addAll(((IDiscreteValueDomain)getParameterByID("resultModel").getValueDomain()).getPossibleValues());
+		
+		String[] lAnew = new String[l.size()];
+		int i = 0;
+		for (String s: l){
+			lAnew[i++] = s;
+		}
+		
+		String[] valueAnew = new String[1];
+		valueAnew[0] = value;
+		returnbool = returnbool | isContained(offering.getObservedProperties(), valueAnew);
+		returnbool = returnbool | isContained(offering.getOutputFormats(), valueAnew);
+		returnbool = returnbool | isContained(offering.getProcedures(), valueAnew);
+		returnbool = returnbool | isContained(offering.getResponseModes(), valueAnew);
+		returnbool = returnbool | isContained(offering.getResultModels(), valueAnew);
+		returnbool = returnbool | isContained(lAnew, valueAnew);
+		return returnbool;
+	}
+	
+	private boolean offeringCheck(String s, String[] configuredprocedures, String[] configuredObservedProperties, String[] configuredFOIs){
+		// TODO there are more possibillities
+		ObservationOffering dataset = (ObservationOffering)contents.getDataIdentification(s);
+
+		// check contents for observedproperties
+		if (configuredObservedProperties!= null){
+			String[] observedpropertiesInOffering = dataset.getObservedProperties();
+			if (!isContained(observedpropertiesInOffering, configuredObservedProperties)){
+				return false;
+			}
+		}
+
+		// check contents for FOIs
+		if (configuredFOIs!= null){
+			String[] fOIs = dataset.getFeatureOfInterest();
+			if (!isContained(fOIs, configuredFOIs)){
+				return false;
+			}
+		}
+
+		// check contents for procedures
+		if (configuredprocedures!= null){
+			String[] procedures = dataset.getProcedures();
+			if (!isContained(procedures, configuredprocedures)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public void setContents(org.n52.oxf.owsCommon.capabilities.Contents contentss){
+		this.contents = contentss;
+	}
+
+	public void setHeartParameter(final ParameterConfiguration pc,
+			final String typename) throws OXFException {
+		// initialParamConf.setParameter(getHeartParameterName(), typename);
+		pc.setParameterValue(getHeartParameterName(), typename);
+
+		// WORKAROUND
+		if (getHeartParameterName().equals("ObservationId")) {
+			selectedObservationID = typename;
+		}
 	}
 
 	/**
@@ -704,7 +883,6 @@ public class ParameterConfiguration implements Serializable {
 		}
 		return null;
 	}
-
 	/**
 	 * Sets the value of a parameter to value
 	 * 
@@ -756,14 +934,6 @@ public class ParameterConfiguration implements Serializable {
 		return null;
 	}
 
-	public void setContents(org.n52.oxf.owsCommon.capabilities.Contents contentss){
-		this.contents = contentss;
-	}
-	
-	public org.n52.oxf.owsCommon.capabilities.Contents getContents(){
-		return this.contents;
-	}
-	
 	/**
 	 * Sets the value of a parameter to values[]
 	 * 
@@ -843,74 +1013,6 @@ public class ParameterConfiguration implements Serializable {
 
 		}
 		return sb.toString();
-	}
-
-	private final String lineEND = "\n";
-	private final String entryEND = "@";
-
-	/**
-	 * Creates a new instance of {@link ParameterConfiguration} UDig saves map
-	 * and layer connection parameters as Strings. So use this constructor to
-	 * create a new instance of {@link ParameterConfiguration} from the string
-	 * representation created by {@link ParameterConfiguration}{@link #toString()}
-	 * the values are not crosschecked with Capabilities
-	 * 
-	 * @param classRepresentation
-	 */
-	public ParameterConfiguration(final String classRepresentation) {
-		try {
-
-			final String[] cr = classRepresentation.split("\n");
-			if (cr.length > 2) {
-				for (final String s : cr) {
-					if (s.contains(("opID"))) {
-						operationId = s.substring(s.indexOf("opID") + 5, s
-								.length() - 1);
-					} else if (s.contains("url")) {
-						url = s.substring(s.indexOf("url") + 4, s.length() - 1);
-					} else {
-						final String[] s2 = s.split(entryEND);
-						final String name = s2[0];
-						if (s2.length > 2) {
-							final String[] values = new String[s2.length - 1];
-							for (int i = 1; i < s2.length; i++) {
-								values[i - 1] = s2[i];
-							}
-							addParameter(new Parameter(name, false,
-									new StringValueDomain(), name));
-							setParameterValue(name, values);
-						} else {
-							addParameter(new Parameter(name, false,
-									new StringValueDomain(), name));
-							setParameterValue(name, s2[1]);
-							// paramCon.addParameterShell(name, s2[1]);
-						}
-					}
-				}
-			}
-		} catch (final Exception e) {
-			LOGGER.fatal("Could not load parameters", e);
-		}
-		// } else throw new Exception("was los=!");
-
-	}
-
-	public static void main(final String[] args) {
-		try {
-			final ParameterConfiguration pc = new ParameterConfiguration(
-					"doof", "url");
-			pc.addRequiredParameter(new Parameter("1", false,
-					new StringValueDomain(), "1"));
-			pc.setParameterValue("1", "erg1");
-			pc.addOptionalParameter(new Parameter("2", false,
-					new StringValueDomain(), "1"));
-			pc.setParameterValue("2", "erg2");
-			System.out.println(pc);
-			System.out.println(new ParameterConfiguration(pc.toString()));
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 
 }

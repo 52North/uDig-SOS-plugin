@@ -75,40 +75,35 @@ import org.n52.udig.catalog.sos.internal.Messages;
 public class SOSWizardPage extends AbstractUDIGImportPage implements
 		ModifyListener, UDIGConnectionPage, SelectionListener {
 
-	protected Combo urlCombo = null;
-	protected Combo serviceVersionCombo = null;
-	private Button displayCapabilities;
-	private Map<String, Serializable> params;
-	private static final String SOS_WIZARD_ID = "SOSWizard"; //$NON-NLS-1$
-	private static final String SOS_RECENTLY_USED_ID = "RecentlyUsed"; //$NON-NLS-1$
-	private IDialogSettings settings;
-	private String url = ""; //$NON-NLS-1$
 	private static final String[] empty = new String[0];
-
-	// // @Override
-	// protected IDialogSettings getDialogSettings() {
-	// return SOSPlugin.getDefault().getDialogSettings();
-	// }
-
 	/**
 	 * the Apache Log4J-logger. Configured via .xml-file. Set path with
 	 * {@link GeneralConfigurationRegistry}.
 	 */
 	private static final Logger LOGGER = LoggingHandler
 			.getLogger(SOSWizardPage.class);
+	private static final String SOS_RECENTLY_USED_ID = "RecentlyUsed"; //$NON-NLS-1$
+	private static final String SOS_WIZARD_ID = "SOSWizard"; //$NON-NLS-1$
+	private Button displayCapabilities;
+	private Map<String, Serializable> params;
+	private Color red;
+	protected Combo serviceVersionCombo = null;
+	private IDialogSettings settings;
+
+	// // @Override
+	// protected IDialogSettings getDialogSettings() {
+	// return SOSPlugin.getDefault().getDialogSettings();
+	// }
+
+	private String url = ""; //$NON-NLS-1$
+
+	protected Combo urlCombo = null;
 
 	/**
-	 * @return the dataStore
+	 * Creates a new instance of SOSWizardPage
 	 */
-	public DataStore getDataStore() {
-		// .createDatastore uses a cache,
-		try {
-			return SOSDataStoreFactory.getInstance().createDataStore(
-					getParameters());
-		} catch (final IOException ioe) {
-			LOGGER.fatal("Error creating datastore", ioe);
-		}
-		return null;
+	public SOSWizardPage() {
+		this(""); //$NON-NLS-1$
 	}
 
 	/**
@@ -119,13 +114,6 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 	 */
 	public SOSWizardPage(final String pageName) {
 		this(pageName, "title", null);
-	}
-
-	/**
-	 * Creates a new instance of SOSWizardPage
-	 */
-	public SOSWizardPage() {
-		this(""); //$NON-NLS-1$
 	}
 
 	/**
@@ -152,47 +140,14 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 	}
 
 	@Override
-	public void dispose() {
-		super.dispose();
-		if (red != null) {
-			red.dispose();
+	public void setErrorMessage(String newMessage) {
+		if (newMessage != null && newMessage.trim().equalsIgnoreCase("no protocol:")){
+			super.setErrorMessage(null);
+		} else{
+			super.setErrorMessage(newMessage);
 		}
 	}
-
-	private Color red;
-
-	protected Map<String, Serializable> getParameters() {
-		if (urlCombo == null) {
-			return new HashMap<String, Serializable>();
-		}
-		// boolean error = false;
-		try {
-			final URL url = new URL(urlCombo.getText());
-			params.put(SOSDataStoreFactory.URL_SERVICE.key, url);
-
-			if (serviceVersionCombo.getText() != null
-					&& !serviceVersionCombo.getText().trim().equals("")) {
-				params.put(SOSDataStoreFactory.SERVICE_VERSION.key,
-						serviceVersionCombo.getText().trim());
-			}
-			setErrorMessage(null);
-		} catch (final Exception e) {
-			setErrorMessage(e.getMessage());
-		}
-
-		// return error ? new HashMap<String, Serializable> : params;
-		return params;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.refractions.udig.catalog.ui.UDIGConnectionPage#getParams()
-	 */
-	public Map<String, Serializable> getParams() {
-		return null;
-	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -289,6 +244,112 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		// setPageComplete(true);
 	}
 
+	@Override
+	public void dispose() {
+		super.dispose();
+		if (red != null) {
+			red.dispose();
+		}
+	}
+
+	/**
+	 * @return the dataStore
+	 */
+	public DataStore getDataStore() {
+		// .createDatastore uses a cache,
+		try {
+			return SOSDataStoreFactory.getInstance().createDataStore(
+					getParameters());
+		} catch (final IOException ioe) {
+			LOGGER.fatal("Error creating datastore", ioe);
+		}
+		return null;
+	}
+
+	protected Map<String, Serializable> getParameters() {
+		if (urlCombo == null) {
+			return new HashMap<String, Serializable>();
+		}
+		// boolean error = false;
+		try {
+			final URL url = new URL(urlCombo.getText());
+			params.put(SOSDataStoreFactory.URL_SERVICE.key, url);
+
+			if (serviceVersionCombo.getText() != null
+					&& !serviceVersionCombo.getText().trim().equals("")) {
+				params.put(SOSDataStoreFactory.SERVICE_VERSION.key,
+						serviceVersionCombo.getText().trim());
+			}
+			setErrorMessage(null);
+		} catch (final Exception e) {
+			setErrorMessage(e.getMessage());
+		}
+
+		// return error ? new HashMap<String, Serializable> : params;
+		return params;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see net.refractions.udig.catalog.ui.UDIGConnectionPage#getParams()
+	 */
+	public Map<String, Serializable> getParams() {
+		return null;
+	}
+
+	@Override
+	public boolean isPageComplete() {
+		params = new HashMap<String, Serializable>();
+		params = getParameters();
+		if (params == null || params.isEmpty()) {
+			return false;
+		}
+		URL url;
+		url = ((URL) params.get(SOSDataStoreFactory.URL_SERVICE.key));
+		final String trim = url.getHost().trim();
+		if (trim.length() == 0) {
+			return false;
+		}
+
+		String version;
+		version = (String) params.get(SOSDataStoreFactory.SERVICE_VERSION.key);
+		if (version == null) {
+			return false;
+		}
+		if (version.trim().length() == 0) {
+			return false;
+		}
+
+		// is the service a SOS?
+		try {
+			setErrorMessage(null);
+			return SOSDataStoreFactory.getInstance().checkForSOS(url);
+		} catch (final IOException e) {
+			setErrorMessage(e.getMessage());
+			return false;
+		}
+
+		// if (!SOSDataStoreFactory.getInstance().canProcess(params)) {
+		// return false;
+		// }
+	}
+
+	@Override
+	public boolean leavingPage() {
+		try {
+			getParameters();
+			SOSDataStoreFactory.getInstance().getCapabilities(
+					SOSDataStoreFactory.workOnParams(params));
+			return true;
+		} catch (final Exception e) {
+			// SOSPlugin.log("Error creating DataStore", e);
+			setErrorMessage(e.getMessage());
+			LOGGER.fatal("Error leaving wizardpage", e);
+			return false;
+		}
+	}
+
 	public void modifyText(final ModifyEvent e) {
 		if (e.widget != null) {
 
@@ -351,6 +412,10 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		}
 	}
 
+	public void widgetDefaultSelected(final SelectionEvent arg0) {
+		// TODO Auto-generated method stub
+	}
+
 	public void widgetSelected(final SelectionEvent e) {
 		if (e.widget instanceof Button) {
 			final Button b = (Button) e.widget;
@@ -383,61 +448,5 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 			}
 		}
 		getWizard().getContainer().updateButtons();
-	}
-
-	@Override
-	public boolean isPageComplete() {
-		params = new HashMap<String, Serializable>();
-		params = getParameters();
-		if (params == null || params.isEmpty()) {
-			return false;
-		}
-		URL url;
-		url = ((URL) params.get(SOSDataStoreFactory.URL_SERVICE.key));
-		final String trim = url.getHost().trim();
-		if (trim.length() == 0) {
-			return false;
-		}
-
-		String version;
-		version = (String) params.get(SOSDataStoreFactory.SERVICE_VERSION.key);
-		if (version == null) {
-			return false;
-		}
-		if (version.trim().length() == 0) {
-			return false;
-		}
-
-		// is the service a SOS?
-		try {
-			setErrorMessage(null);
-			return SOSDataStoreFactory.getInstance().checkForSOS(url);
-		} catch (final IOException e) {
-			setErrorMessage(e.getMessage());
-			return false;
-		}
-
-		// if (!SOSDataStoreFactory.getInstance().canProcess(params)) {
-		// return false;
-		// }
-	}
-
-	@Override
-	public boolean leavingPage() {
-		try {
-			getParameters();
-			SOSDataStoreFactory.getInstance().getCapabilities(
-					SOSDataStoreFactory.workOnParams(params));
-			return true;
-		} catch (final Exception e) {
-			// SOSPlugin.log("Error creating DataStore", e);
-			setErrorMessage(e.getMessage());
-			LOGGER.fatal("Error leaving wizardpage", e);
-			return false;
-		}
-	}
-
-	public void widgetDefaultSelected(final SelectionEvent arg0) {
-		// TODO Auto-generated method stub
 	}
 }

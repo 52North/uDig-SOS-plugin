@@ -69,7 +69,6 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 	private final HashMap<SOSOperationType, Document> infos = new HashMap<SOSOperationType, Document>(
 			5);
 	private ListViewer operationIdViewer;
-	// private Map<String, Serializable> params;
 
 	private TextViewer textViewer;
 
@@ -100,9 +99,6 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 		final Composite parent = new Composite(arg, SWT.NONE);
 		parent.setLayout(new GridLayout(2, false));
 
-		// dataStore = (SOSDataStore) ((SOSWizardPage) getPreviousPage())
-		// .getDataStore();
-
 		try {
 			operationIdViewer = new ListViewer(parent, SWT.SINGLE);
 			textViewer = new TextViewer(parent, SWT.MULTI | SWT.V_SCROLL
@@ -114,7 +110,6 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 					new GridData(SWT.FILL, SWT.FILL, false, true));
 			// operationIdViewer.add(new String(" "));
 			// init and cache caps
-			// dataStore.getCapabilities();
 
 			operationIdViewer
 					.addPostSelectionChangedListener(new ISelectionChangedListener() {
@@ -154,7 +149,6 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 						}
 
 					});
-			// operationIdViewer.remove(element)
 			operationIdViewer.setContentProvider(new SOSContentProvider());
 
 			titleDecorator = new ResolveTitlesDecorator(
@@ -164,8 +158,6 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 
 			operationIdViewer.setLabelProvider(labelProvider);
 
-			// String allOperations[] =
-			// dataStore.getCapabilities().getOperations().getAllOperationNames();
 			final String allOperations[] = SOSDataStoreFactory
 					.getInstance()
 					.getCapabilities(
@@ -189,7 +181,6 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 			for (final String s : filteredOperations) {
 				filteredOperationsArray[i++] = s;
 			}
-			// operationIdViewer.setInput(filteredOperations.toArray());
 			operationIdViewer.setInput(filteredOperationsArray);
 
 		} catch (final Exception e) {
@@ -201,12 +192,6 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 	public DataStore getDataStore() {
 		return dataStore;
 	}
-
-	// @Override
-	// protected IDialogSettings getDialogSettings() {
-	// return getPreviousPage().getWizard().getDialogSettings();
-	// // return SOSPlugin.getDefault().getDialogSettings();
-	// }
 
 	private Document getInfo(final SOSOperationType opType) {
 		if (infos.containsKey(opType)) {
@@ -251,17 +236,4 @@ public class SOSSelectOperationPage extends AbstractUDIGImportPage implements
 		}
 		return super.isPageComplete();
 	}
-
-	// SOSOperationType sosoptye =
-	// (SOSOperationType)SOSDataStoreFactory.getInstance()
-	// .getCapabilities(SOSDataStoreFactory.workOnParams(params))
-	// .getOperations().getOperationTypeByName((String)params.get(SOSDataStoreFactory.OPERATION.key));
-	//
-	// SOSConfigurationRegistry.getInstance().updateParameterConfiguration(((URL)params.get(SOSDataStoreFactory.URL_SERVICE.key)).toExternalForm(),
-	// operation, sosoptye.getParameterConfiguration())
-	// // .setParameterConfiguration(
-	// //
-	// SOSConfigurationRegistry.getInstance().updateParameterConfiguration(((URL)params.get(SOSDataStoreFactory.URL_SERVICE.key)).toExternalForm(),
-	// params.get(SOSDataStoreFactory.OPERATION.key), );
-
 }

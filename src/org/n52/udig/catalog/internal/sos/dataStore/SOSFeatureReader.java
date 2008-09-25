@@ -102,7 +102,11 @@ public class SOSFeatureReader implements FeatureReader {
 						(String) params.get(SOSDataStoreFactory.OPERATION.key));
 
 		if (pc != null) {
-			pc.setHeartParameter(pc, typeName);
+			if (!opType.getId().equals("GetObservation")){
+				pc.setHeartParameter(pc, typeName);
+			} else{
+				
+			}
 		} else {
 			// TODO what should be the default behaviour?
 		}

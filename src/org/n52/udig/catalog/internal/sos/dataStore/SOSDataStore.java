@@ -181,6 +181,8 @@ public class SOSDataStore extends AbstractDataStore {
 		if (typeNames == null) {
 			final String op = (String) params
 					.get(SOSDataStoreFactory.OPERATION.key);
+			
+			
 			return ((ParameterConfiguration) params
 					.get(SOSDataStoreFactory.PARAMETERS.key)).getTypeNames();
 			// return ((SOSOperationType) capabilities.getOperations()

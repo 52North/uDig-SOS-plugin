@@ -277,7 +277,6 @@ public class SOSDataStoreFactory extends AbstractDataStoreFactory {
 	 *             response
 	 */
 	public boolean checkForSOS(final URL serviceURL) throws IOException {
-
 		return !getSupportedVersions(serviceURL).isEmpty();
 	}
 
@@ -303,8 +302,7 @@ public class SOSDataStoreFactory extends AbstractDataStoreFactory {
 				if (dsCache.get(params).getLastUpdated()
 						- System.currentTimeMillis() > GeneralConfigurationRegistry
 						.getInstance().getTimeToCacheDatastore()) {
-					LOGGER
-							.debug(
+					LOGGER.debug(
 									"Cache hit, however max. cachetime exceeded, creating new instance",
 									null);
 					return createNewDataStore(params);

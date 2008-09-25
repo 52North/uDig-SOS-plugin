@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.locks.Lock;
 
 import net.refractions.udig.catalog.CatalogPlugin;
@@ -80,7 +81,14 @@ public class SOSServiceImpl extends IService {
 		if (url == null) {
 			url = (URL) params.get(SOSDataStoreFactory.URL_SERVICE.key);
 		}
-		this.url = url;
+//		this.url = url;
+		try {
+				Random r = new Random();
+				this.url = new URL(url.toExternalForm()+r.nextInt());	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		this.params = params;
 	}
 
@@ -187,12 +195,12 @@ public class SOSServiceImpl extends IService {
 			try {
 				if (info == null) {
 					info = new SOSServiceInfo(ds);
-					// final IResolveDelta delta = new ResolveDelta(this,
-					// IResolveDelta.Kind.CHANGED);
-					// ((CatalogImpl)
-					// CatalogPlugin.getDefault().getLocalCatalog())
-					// .fire(new ResolveChangeEvent(this,
-					// IResolveChangeEvent.Type.POST_CHANGE, delta));
+//					 final IResolveDelta delta = new ResolveDelta(this,
+//					 IResolveDelta.Kind.CHANGED);
+//					 ((CatalogImpl)
+//					 CatalogPlugin.getDefault().getLocalCatalog())
+//					 .fire(new ResolveChangeEvent(this,
+//					 IResolveChangeEvent.Type.POST_CHANGE, delta));
 				}
 			} finally {
 				rLock.unlock();
@@ -269,6 +277,7 @@ public class SOSServiceImpl extends IService {
 
 		public SOSServiceInfo(final SOSDataStore ds) throws IOException {
 			this.datastore = ds;
+			
 			capabilities = SOSDataStoreFactory.getInstance().getCapabilities(
 					url, ds.getServiceVersion());
 			keywords = capabilities.getService().getKeywordList();

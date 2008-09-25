@@ -825,7 +825,7 @@ public class SOSCapabilities extends Capabilities {
 	public ReferencedEnvelope getBoundingBox(final String operation,
 			final String typeName) {
 		if (operation.equals(SOSOperations.opName_GetObservation)) {
-			final ReferencedEnvelope re = getBBoxFromOffering(typeName);
+			final ReferencedEnvelope re = getBBoxFromOffering(typeName.substring(0,typeName.indexOf("#")));
 			if (re == null) {
 				LOGGER.warn("No BoundingBox Found");
 			}
