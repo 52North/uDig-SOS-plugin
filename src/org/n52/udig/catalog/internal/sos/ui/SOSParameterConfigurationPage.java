@@ -83,7 +83,6 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 	private Text featureIDInputText;
 
-
 	private Label featureIDLabel;
 
 	private Combo offeringComboBox = null;
@@ -93,16 +92,15 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 	private Tree parameterValueViewer;
 
-	// private ListViewer parameterViewer;
 	private Tree parameterViewer;
 
-	SOSSelectOperationPage prevPage;
+	private SOSSelectOperationPage prevPage;
 
 	private final Spinner[] spin1 = new Spinner[6];
 
 	private final Spinner[] spin2 = new Spinner[6];
 
-	Composite timebox;
+	private Composite timebox;
 
 	public SOSParameterConfigurationPage() {
 		this("ParameterConfiguration");
@@ -188,8 +186,6 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		final List<String> selectedValues = new LinkedList<String>();
 
 		int i = 0;
-
-
 
 		if (pbID != null) {
 			if (pbID.getValueDomain() instanceof TemporalValueDomain) {
