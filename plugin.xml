@@ -16,18 +16,20 @@
             id="org.n52.udig.catalog.internal.sos.ui">
       </factory>
       <wizardPage
+            banner="icons/wizban/wfs_wiz.gif"
             class="org.n52.udig.catalog.internal.sos.ui.SOSWizardPage"
-            description="%wizard.description"
+            description="Imports a Sensor Observation Service into the catalog"
+            icon="icons/etool16/wfs_wiz.gif"
             name="SensorObservationService">
       </wizardPage>
       <wizardPage
             class="org.n52.udig.catalog.internal.sos.ui.SOSSelectOperationPage"
-            description="%wizard.description"
+            description="Imports a Sensor Observation Service into the catalog"
             name="SelectOperation">
       </wizardPage>
       <wizardPage
             class="org.n52.udig.catalog.internal.sos.ui.SOSParameterConfigurationPage"
-            description="&quot;left: select your parameters; right select parameter values; next button is disabled untli all parameters are configured&quot;"
+            description="Select the offering and set parameters; &quot;left: select your parameters; right select parameter values; next button is disabled untli all parameters are configured&quot;"
             name="ConfigureParameters">
       </wizardPage>
    </extension>
