@@ -81,13 +81,13 @@ public class SOSServiceImpl extends IService {
 		if (url == null) {
 			url = (URL) params.get(SOSDataStoreFactory.URL_SERVICE.key);
 		}
-//		this.url = url;
-		try {
-				Random r = new Random();
-				this.url = new URL(url.toExternalForm()+r.nextInt());	
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		this.url = url;
+//		try {
+//				Random r = new Random();
+//				this.url = new URL(url.toExternalForm()+r.nextInt());	
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		
 		this.params = params;
 	}

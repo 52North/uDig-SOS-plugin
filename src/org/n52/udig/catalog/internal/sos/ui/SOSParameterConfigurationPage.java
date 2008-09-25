@@ -53,7 +53,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.n52.oxf.OXFException;
-import org.n52.oxf.feature.sos.SOSObservationStore;
 import org.n52.oxf.owsCommon.capabilities.IDiscreteValueDomain;
 import org.n52.oxf.owsCommon.capabilities.ITime;
 import org.n52.oxf.serviceAdapters.ParameterShell;
@@ -290,8 +289,6 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	}
 
 	public void createBasicControl(final Composite arg0) {
-		
-		
 		final Composite composite1 = new Group(arg0, SWT.NULL);
 		composite1.setLayout(new GridLayout(1, false));
 		composite1.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -313,6 +310,11 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		getTimeViewer(composite1);
 		getDescriptionViewer(composite1);
 		setControl(composite1);
+		
+//		if (!identifyOperation().equals("GetObservation")){
+//			composite2.setVisible(false);
+//		}
+		
 	}
 
 	/*
@@ -374,6 +376,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		offeringComboBox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
 				false));
 		offeringComboBox.addSelectionListener(this);
+		offeringComboBox.setVisible(false);
 		
 	}
 
@@ -613,6 +616,8 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	
 	private void operationChanged() {
 		try {
+			
+			
 			paramConf = identifyOperation().getNewPreconfiguredConfiguration();
 			// this is a good time to configure the
 			// operation with SOSConfigurationRegistry
@@ -634,7 +639,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		}
 		
 		if (getParams().get(SOSDataStoreFactory.OPERATION.key).equals(
-				SOSOperations.opName_GetObservationById)) {
+				SOSOperations.opName_GetObservation)) {
 			offeringComboBox.setVisible(true);
 		}
 		if (getParams().get(SOSDataStoreFactory.OPERATION.key).equals(
@@ -649,7 +654,12 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		}
 
 //		populateOperation();
-		populateOffering();
+		if (identifyOperation().getId().equals("GetObservation")){
+			populateOffering();
+		} else{
+			populateOperation();
+		}
+		
 
 		dirtyBit = false;
 	}
@@ -663,6 +673,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		for (String s : offerings){
 			offeringComboBox.add(s);
 		}
+//		populateOperation();
 	}
 
 	protected void populateOperation() {
