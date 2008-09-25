@@ -157,8 +157,9 @@ public class SOSDataStore extends AbstractDataStore {
 			featureReaderCache.put(typeName, new SOSFeatureReader(params,
 					adapter, typeName));
 		} else if (featureReaderCache.get(typeName).isUsed()) {
-			featureReaderCache.put(typeName, new SOSFeatureReader(params,
-					adapter, typeName));
+			featureReaderCache.put(typeName, featureReaderCache.get(typeName).getThisRestarted());
+//			featureReaderCache.put(typeName, new SOSFeatureReader(params,
+//			adapter, typeName));
 		}
 		return featureReaderCache.get(typeName);
 	}

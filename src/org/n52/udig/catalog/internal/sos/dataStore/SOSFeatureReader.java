@@ -29,6 +29,7 @@ package org.n52.udig.catalog.internal.sos.dataStore;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -78,10 +79,10 @@ public class SOSFeatureReader implements FeatureReader {
 	private boolean used;
 	private FeatureType featureType;
 	private OperationResult opResult;
-/** the Log4J Logger */
+	/** the Log4J Logger */
 	private static final Logger LOGGER = LoggingHandler
 			.getLogger(SOSFeatureReader.class);
-
+	
 	public Geometry getBoundingBox() {
 		return featureCollection.getBoundingBox();
 	}
@@ -156,6 +157,72 @@ public class SOSFeatureReader implements FeatureReader {
 		it = featureCollection.iterator();
 	}
 
+	private void handleException(OXFException oxfe) throws IOException{
+		if (LOGGER.isEnabledFor(Level.DEBUG)) {
+			LOGGER.error(oxfe);
+			oxfe.printStackTrace();
+		}
+
+		if (oxfe.getCause().getClass().isAssignableFrom(
+				org.apache.xmlbeans.XmlException.class)) {
+			throw new IOException(
+					"SOS reported an error, could not open FeatureReader, the server returned no valid xml: "
+							+ oxfe.getMessage()
+							+ " ;"
+							+ oxfe.getCause().getMessage());
+		} else if (oxfe.getCause().getClass().isAssignableFrom(
+				org.xml.sax.SAXParseException.class)) {
+			throw new IOException(
+					"SOS reported an error, could not open FeatureReader, the server returned no valid xml: "
+							+ oxfe.getMessage()
+							+ " ;"
+							+ oxfe.getCause().getMessage());
+		} else if (oxfe.getCause().getClass().isAssignableFrom(
+				java.lang.NumberFormatException.class)) {
+			throw new IOException(
+					"SOS reported an error, could not open FeatureReader, the server returned an invalid value : "
+							+ oxfe.getCause().getClass()
+							+ " "
+							+ oxfe.getCause().getMessage());
+		} else {
+			throw new IOException(
+					"SOS reported an error, could not open FeatureReader: "
+							+ oxfe.getMessage() + " "
+							+ oxfe.getCause().getClass() + " "
+							+ oxfe.getCause().getMessage());
+		}
+	}
+	
+	private void handleException(ExceptionReport e) throws IOException{
+		LOGGER.error("The Server reported an error:", e);
+		final Iterator<OWSException> it = e.getExceptionsIterator();
+		while (it.hasNext()) {
+			final OWSException e2 = it.next();
+			LOGGER.error(e2.getExceptionCode());
+			LOGGER.error(e2.getExceptionTexts());
+		}
+		LOGGER.error(e.getStackTrace());
+		throw new IOException(
+				"The Server reported at least one error, please check your logs for the error message "
+						+ e.getMessage());
+		// LOGGER.error(e.getMessage());
+	}
+	
+	private SOSFeatureReader(final Map<String, Serializable> params,
+			final SOSAdapter adapter, final String typeName, SOSOperationType opType, FeatureType featureType, OXFFeatureCollection featureCollection, OperationResult opResult){
+		this.closed = false;
+		this.used = false;
+		this.params = params;
+		this.adapter = adapter;
+		// this.datastore = data;
+		this.typeName = typeName;
+		this.opType = opType;
+		this.featureType = featureType;
+		this.featureCollection = featureCollection;
+		this.opResult = opResult;
+		this.it = featureCollection.iterator();
+	}
+	
 	/**
 	 * Creates a new instance of SOSFeatureReader
 	 * 
@@ -167,63 +234,20 @@ public class SOSFeatureReader implements FeatureReader {
 			final SOSAdapter adapter, final String typeName) throws IOException {
 		// public SOSFeatureReader(Map<String, Serializable> params,
 		// SOSAdapter adapter, SOSDataStore data, String typeName) {
+		this.closed = false;
+		this.used = false;
+		this.params = params;
+		this.adapter = adapter;
+		// this.datastore = data;
+		this.typeName = typeName;
 		try {
-			this.closed = false;
-			this.used = false;
-			this.params = params;
-			this.adapter = adapter;
-			// this.datastore = data;
-			this.typeName = typeName;
 			create();
 
 		} catch (final OXFException oxfe) {
-			if (LOGGER.isEnabledFor(Level.DEBUG)) {
-				LOGGER.error(oxfe);
-				oxfe.printStackTrace();
-			}
-
-			if (oxfe.getCause().getClass().isAssignableFrom(
-					org.apache.xmlbeans.XmlException.class)) {
-				throw new IOException(
-						"SOS reported an error, could not open FeatureReader, the server returned no valid xml: "
-								+ oxfe.getMessage()
-								+ " ;"
-								+ oxfe.getCause().getMessage());
-			} else if (oxfe.getCause().getClass().isAssignableFrom(
-					org.xml.sax.SAXParseException.class)) {
-				throw new IOException(
-						"SOS reported an error, could not open FeatureReader, the server returned no valid xml: "
-								+ oxfe.getMessage()
-								+ " ;"
-								+ oxfe.getCause().getMessage());
-			} else if (oxfe.getCause().getClass().isAssignableFrom(
-					java.lang.NumberFormatException.class)) {
-				throw new IOException(
-						"SOS reported an error, could not open FeatureReader, the server returned an invalid value : "
-								+ oxfe.getCause().getClass()
-								+ " "
-								+ oxfe.getCause().getMessage());
-			} else {
-				throw new IOException(
-						"SOS reported an error, could not open FeatureReader: "
-								+ oxfe.getMessage() + " "
-								+ oxfe.getCause().getClass() + " "
-								+ oxfe.getCause().getMessage());
-			}
+			handleException(oxfe);
 
 		} catch (final ExceptionReport e) {
-			LOGGER.error("The Server reported an error:", e);
-			final Iterator<OWSException> it = e.getExceptionsIterator();
-			while (it.hasNext()) {
-				final OWSException e2 = it.next();
-				LOGGER.error(e2.getExceptionCode());
-				LOGGER.error(e2.getExceptionTexts());
-			}
-			LOGGER.error(e.getStackTrace());
-			throw new IOException(
-					"The Server reported at least one error, please check your logs for the error message "
-							+ e.getMessage());
-			// LOGGER.error(e.getMessage());
+			handleException(e);
 		}
 	}
 
@@ -282,5 +306,9 @@ public class SOSFeatureReader implements FeatureReader {
 	 */
 	public boolean isUsed() {
 		return used;
+	}
+	
+	public SOSFeatureReader getThisRestarted(){
+		return new SOSFeatureReader(params,adapter,typeName,opType, featureType, featureCollection, opResult);
 	}
 }
