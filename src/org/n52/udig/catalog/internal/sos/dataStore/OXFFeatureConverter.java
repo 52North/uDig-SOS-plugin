@@ -157,6 +157,7 @@ public class OXFFeatureConverter {
 							oxffeature.getID());
 				}
 
+				// Geometry
 				if (oxffeature.getGeometry() != null) {
 					f.setDefaultGeometry(oxffeature.getGeometry());
 					isGeometrySet = true;
@@ -179,6 +180,12 @@ public class OXFFeatureConverter {
 								.getGeometry());
 						isGeometrySet = true;
 					}
+//					if (!isGeometrySet && name.equals("featureOfInterest")) {
+//						f.setDefaultGeometry(((OXFFeature) oxffeature
+//								.getAttribute("featureOfInterest"))
+//								.getGeometry());
+//						isGeometrySet = true;
+//					}
 
 					final AttributeType at = f.getFeatureType()
 							.getAttributeType(j);

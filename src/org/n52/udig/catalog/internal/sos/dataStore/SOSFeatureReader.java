@@ -52,6 +52,7 @@ import org.n52.oxf.util.LoggingHandler;
 import org.n52.udig.catalog.internal.sos.dataStore.config.ParameterConfiguration;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSOperationType;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -83,7 +84,8 @@ public class SOSFeatureReader implements FeatureReader {
 			.getLogger(SOSFeatureReader.class);
 	
 	public Geometry getBoundingBox() {
-		return featureCollection.getBoundingBox();
+		Geometry g = featureCollection.getBoundingBox();
+		return g; 
 	}
 
 	/**

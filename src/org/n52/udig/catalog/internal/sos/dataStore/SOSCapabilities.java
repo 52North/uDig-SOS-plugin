@@ -803,13 +803,13 @@ public class SOSCapabilities extends Capabilities {
 				try {
 					final ReferencedEnvelope tempbbox = new ReferencedEnvelope(
 							oxfService.getContents().getDataIdentification(i)
-									.getBoundingBoxes()[0].getLowerCorner()[0],
-							oxfService.getContents().getDataIdentification(i)
-									.getBoundingBoxes()[0].getUpperCorner()[0],
-							oxfService.getContents().getDataIdentification(i)
 									.getBoundingBoxes()[0].getLowerCorner()[1],
 							oxfService.getContents().getDataIdentification(i)
 									.getBoundingBoxes()[0].getUpperCorner()[1],
+							oxfService.getContents().getDataIdentification(i)
+									.getBoundingBoxes()[0].getLowerCorner()[0],
+							oxfService.getContents().getDataIdentification(i)
+									.getBoundingBoxes()[0].getUpperCorner()[0],
 							CRS.decode(crs));
 
 					return tempbbox;
