@@ -163,8 +163,8 @@ public class ParameterConfiguration implements Serializable {
 	 * Creates a new instance of {@link ParameterConfiguration} UDig saves map
 	 * and layer connection parameters as Strings. So use this constructor to
 	 * create a new instance of {@link ParameterConfiguration} from the string
-	 * representation created by {@link ParameterConfiguration}{@link #toString()}
-	 * the values are not crosschecked with Capabilities
+	 * representation created by {@link ParameterConfiguration}{@link #toString()}.
+	 * Note: The values are not crosschecked with Capabilities
 	 * 
 	 * @param classRepresentation
 	 */
@@ -638,17 +638,26 @@ public class ParameterConfiguration implements Serializable {
 		final List<String> out = new Vector<String>();
 		for (final Parameter param : getUnconfiguredOptionalParameters()) {
 			// XXX WORKAROUND!
-			if (!param.getServiceSidedName().equalsIgnoreCase("bbox")
-					&& !param.getServiceSidedName().equalsIgnoreCase(
-							"EventTime")) {
+			if (param.getServiceSidedName().equalsIgnoreCase("bbox")){
+				
+			} else if (param.getServiceSidedName().equalsIgnoreCase("EventTime")){
+				if (!out.contains(param.getServiceSidedName())){
+					out.add(param.getServiceSidedName());
+				}
+			}
+			// NOT BBOX or EventTime
+			else {
+				// check if parameter has valid values for this offering
 				boolean added = false;
 				for (Object o:((IDiscreteValueDomain)param.getValueDomain()).getPossibleValues()){
 					if (!added && l.contains(o)){
 						added = true;
-						out.add(param.getServiceSidedName());
+						if (!out.contains(param.getServiceSidedName())){
+							out.add(param.getServiceSidedName());
+						}
 					}
 				}
-			}
+			} 
 		}
 		return out;
 	}
@@ -682,9 +691,7 @@ public class ParameterConfiguration implements Serializable {
 		final List<String> out = new Vector<String>();
 		for (final Parameter param : getUnconfiguredRequiredParameters()) {
 			// XXX WORKAROUND!
-			if (!param.getServiceSidedName().equalsIgnoreCase("bbox")
-					&& !param.getServiceSidedName().equalsIgnoreCase(
-							"EventTime")) {
+			if (!param.getServiceSidedName().equalsIgnoreCase("bbox")) {
 				out.add(param.getServiceSidedName());
 			}
 		}
@@ -701,9 +708,15 @@ public class ParameterConfiguration implements Serializable {
 		final List<String> out = new Vector<String>();
 		for (final Parameter param : getUnconfiguredRequiredParameters()) {
 			// XXX WORKAROUND!
-			if (!param.getServiceSidedName().equalsIgnoreCase("bbox")
-					&& !param.getServiceSidedName().equalsIgnoreCase(
-							"EventTime")) {
+			if (param.getServiceSidedName().equalsIgnoreCase("bbox")){
+				
+			} else if (param.getServiceSidedName().equalsIgnoreCase("EventTime")){
+				if (!out.contains(param.getServiceSidedName())){
+					out.add(param.getServiceSidedName());
+				}
+			}
+			// NOT BBOX or EventTime
+			else {
 				boolean added = false;
 				for (Object o:((IDiscreteValueDomain)param.getValueDomain()).getPossibleValues()){
 					if (!added && l.contains(o)){

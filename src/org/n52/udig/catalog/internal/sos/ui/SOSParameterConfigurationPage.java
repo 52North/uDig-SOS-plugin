@@ -113,8 +113,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	public SOSParameterConfigurationPage(final String pageName) {
 		super(pageName);
 		super.setTitle("Sensor Observation Service");
-		super
-				.setDescription("left: Select your parameters; right parametervalues; next button is disabled untli all parameters are configured");
+		super.setDescription("left: Select your parameters; right parametervalues; next button is disabled untli all parameters are configured");
 	}
 
 	private String changedOfferingComboBox(){
@@ -219,19 +218,17 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 						spin1[2].setSelection(Integer.parseInt(""
 								+ timePeriod.getStart().getYear()));
 						spin1[3].setSelection(timePeriod.getStart().getHour());
-						spin1[4]
-								.setSelection(timePeriod.getStart().getMinute());
+						spin1[4].setSelection(timePeriod.getStart().getMinute());
 
-						// spin1[5].setSelection(Integer.parseInt(""+timePeriod.getStart().getSecond()));
-
+						spin1[5].setSelection(new Float(timePeriod.getStart().getSecond()+0.5).intValue());
+						
 						spin2[0].setSelection(timePeriod.getEnd().getDay());
 						spin2[1].setSelection(timePeriod.getEnd().getMonth());
 						spin2[2].setSelection(Integer.parseInt(""
 								+ timePeriod.getEnd().getYear()));
 						spin2[3].setSelection(timePeriod.getEnd().getHour());
 						spin2[4].setSelection(timePeriod.getEnd().getMinute());
-
-						// spin2[5].setSelection(Integer.parseInt(""+timePeriod.getEnd().getSecond()));
+						spin2[5].setSelection(new Float(timePeriod.getEnd().getSecond()+0.5).intValue());
 					}
 				} else {
 					LOGGER.warn("NOT SUPPORTED");
@@ -419,7 +416,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 						.getParameters());
 	}
 
-	private StringBuffer getTimeLine1(final StringBuffer timeS) {
+	private StringBuffer getTimeLineValues1(final StringBuffer timeS) {
 		final int day1 = spin1[0].getSelection();
 		final int month1 = spin1[1].getSelection();
 		final int year1 = spin1[2].getSelection();
@@ -441,7 +438,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		return timeS;
 	}
 
-	private StringBuffer getTimeLine2(final StringBuffer timeS) {
+	private StringBuffer getTimeLineValues2(final StringBuffer timeS) {
 		final int day2 = spin2[0].getSelection();
 		final int month2 = spin2[1].getSelection();
 		final int year2 = spin2[2].getSelection();
@@ -705,7 +702,6 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 			listReq = paramConf.getUnconfiguredRequiredParametersAsStrings();
 		}
 		for (final String s : listReq) {
-
 			if (!SOSConfigurationRegistry.getInstance().getOmitParameter(
 					((SOSSelectOperationPage) getPreviousPage())
 							.getParameters().get(
@@ -811,9 +807,9 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 					}
 					StringBuffer timeS = new StringBuffer(39);
 
-					timeS = getTimeLine1(timeS);
+					timeS = getTimeLineValues1(timeS);
 					timeS.append("/");
-					timeS = getTimeLine2(timeS);
+					timeS = getTimeLineValues2(timeS);
 
 					final ITime time = TimeFactory.createTime(timeS.toString());
 
@@ -842,5 +838,11 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		}
 		getWizard().getContainer().updateButtons();
 
+	}
+	
+	public static void main(String[] args) {
+		float testzahl = 20.0f;
+		int testint = new Float(testzahl+0.5).intValue();
+		System.out.println(testint);
 	}
 }
