@@ -1,4 +1,6 @@
 
+- if udig does not load the plugin, pass the option -clean to the executable
+- if udig does not load the plugin, remove junit from the configuration or copy junitplugins from the sdk to udig-plugin directory  
 
 - Spatial Operators not used in requests. 
 - Parameter BoundingBox is not used. This leads to some unnecessary requests. May be difficult to implement.
