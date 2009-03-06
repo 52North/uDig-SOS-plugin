@@ -63,6 +63,7 @@ import org.n52.oxf.valueDomains.time.ITimePosition;
 import org.n52.oxf.valueDomains.time.ITimeResolution;
 import org.n52.oxf.valueDomains.time.TemporalValueDomain;
 import org.n52.oxf.valueDomains.time.TimeFactory;
+import org.n52.udig.catalog.internal.sos.SOSPlugin;
 import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStoreFactory;
 import org.n52.udig.catalog.internal.sos.dataStore.SOSOperations;
 import org.n52.udig.catalog.internal.sos.dataStore.config.ParameterConfiguration;
@@ -112,8 +113,11 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	 */
 	public SOSParameterConfigurationPage(final String pageName) {
 		super(pageName);
-		super.setTitle("Sensor Observation Service");
-		super.setDescription("left: Select your parameters; right parametervalues; next button is disabled untli all parameters are configured");
+		
+		setTitle("Sensor Observation Service");
+		setDescription("left: Select your parameters; right parametervalues; next button is disabled untli all parameters are configured");
+		
+//		Select the offering and set parameters; "left: select your parameters; right select parameter values; next button is disabled until all parameters are configured"
 	}
 
 	private String changedOfferingComboBox(){
@@ -808,7 +812,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 					StringBuffer timeS = new StringBuffer(39);
 
 					timeS = getTimeLineValues1(timeS);
-					timeS.append("/");
+					timeS.append('/');
 					timeS = getTimeLineValues2(timeS);
 
 					final ITime time = TimeFactory.createTime(timeS.toString());
@@ -823,18 +827,17 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 						}
 					}
 				}
-
 			} catch (final Exception e) {
 				LOGGER.error(e);
 				e.printStackTrace();
 			}
-
 		}
 
 		if (error == null) {
 			setErrorMessage(null);
 		} else if (!error.equals("")) {
 			setErrorMessage(error);
+			getWizard().getContainer().updateTitleBar();
 		}
 		getWizard().getContainer().updateButtons();
 

@@ -59,6 +59,11 @@ import org.n52.udig.catalog.internal.sos.dataStore.SOSOperations;
 public class ParameterConfiguration implements Serializable {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5935103077342801799L;
+
+	/**
 	 * the Log4j-logger, configured with {@link GeneralConfigurationRegistry}
 	 */
 	private static final Logger LOGGER = LoggingHandler

@@ -171,11 +171,11 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		String[] temp = settings.getArray(SOS_RECENTLY_USED_ID);
 		if (temp == null) {
 			// fallback
-			temp = new String[4];
+			temp = new String[3];
 			temp[0] = "";
-			temp[1] = "http://v-swe.uni-muenster.de:8080/HWS-SOS/sos";
-			temp[2] = "http://v-swe.uni-muenster.de:8080/WeatherSOS/sos";
-			temp[3] = "http://sensorweb.dlz-it-bvbs.bund.de/PegelOnlineSOS/sos";
+//			temp[1] = "http://v-swe.uni-muenster.de:8080/HWS-SOS/sos";
+			temp[1] = "http://v-swe.uni-muenster.de:8080/WeatherSOS/sos";
+			temp[2] = "http://sensorweb.dlz-it-bvbs.bund.de/PegelOnlineSOS/sos";
 		}
 
 		final List<String> recent = Arrays.asList(temp);
