@@ -73,7 +73,6 @@
 	        <pathelement location="${ECLIPSE_HOME}/plugins/org.eclipse.core.expressions_3.3.0.v20070606-0010.jar"/>
 	        <pathelement location="${ECLIPSE_HOME}/plugins/org.eclipse.jface.text_3.3.1.r331_v20070629.jar"/>
 	        <pathelement location="${ECLIPSE_HOME}/plugins/org.eclipse.text_3.3.0.v20070606-0010.jar"/>
-	        <pathelement location="${ECLIPSE_HOME}/plugins/org.junit_3.8.2.v200706111738/junit.jar"/>
 	    </path>
 	
 	<path id="net.refractions.udig.catalog.sos.classpath">

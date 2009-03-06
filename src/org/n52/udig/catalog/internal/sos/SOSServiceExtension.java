@@ -87,7 +87,7 @@ public class SOSServiceExtension extends AbstractDataStoreServiceExtension
 		return params;
 	}
 
-	@Override
+	
 	public String reasonForFailure(final URL url) {
 		// return processURL(url);
 		return reasonForFailure;
