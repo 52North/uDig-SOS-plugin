@@ -38,6 +38,10 @@ import org.n52.oxf.feature.dataTypes.OXFMeasureType;
 
 public class MeasureType extends OXFMeasureType implements Duplicatable {
 
+	public int hashCode() {
+		return 0;
+	}
+
 	/**
 	 * Creates a new instance of {@link MeasureType}. Just calls super.
 	 * 

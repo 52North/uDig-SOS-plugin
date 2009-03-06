@@ -74,6 +74,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		ModifyListener, UDIGConnectionPage, SelectionListener {
 
 	private static final String[] empty = new String[0];
+	private final static String S_EMPTYSTRING = "";
 	
 	/**
 	 * the Apache Log4J-logger. Configured via .xml-file. Set path with
@@ -94,7 +95,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 	// return SOSPlugin.getDefault().getDialogSettings();
 	// }
 
-	private String url = ""; //$NON-NLS-1$
+	private String url = S_EMPTYSTRING; //$NON-NLS-1$
 
 	protected Combo urlCombo = null;
 
@@ -102,7 +103,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 	 * Creates a new instance of SOSWizardPage
 	 */
 	public SOSWizardPage() {
-		this(""); //$NON-NLS-1$
+		this(S_EMPTYSTRING); //$NON-NLS-1$
 	}
 
 	/**
@@ -112,7 +113,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 	 *            the title of the created page
 	 */
 	public SOSWizardPage(final String pageName) {
-		this(pageName, "title", null);
+		this(pageName, S_EMPTYSTRING, null);
 	}
 
 	/**
@@ -172,7 +173,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		if (temp == null) {
 			// fallback
 			temp = new String[3];
-			temp[0] = "";
+			temp[0] = S_EMPTYSTRING;
 //			temp[1] = "http://v-swe.uni-muenster.de:8080/HWS-SOS/sos";
 			temp[1] = "http://v-swe.uni-muenster.de:8080/WeatherSOS/sos";
 			temp[2] = "http://sensorweb.dlz-it-bvbs.bund.de/PegelOnlineSOS/sos";
@@ -280,7 +281,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 			params.put(SOSDataStoreFactory.URL_SERVICE.key, url);
 
 			if (serviceVersionCombo.getText() != null
-					&& !serviceVersionCombo.getText().trim().equals("")) {
+					&& !serviceVersionCombo.getText().trim().equals(S_EMPTYSTRING)) {
 				params.put(SOSDataStoreFactory.SERVICE_VERSION.key,
 						serviceVersionCombo.getText().trim());
 			}
@@ -384,7 +385,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 							serviceVersionCombo.setEnabled(true);
 							if (serviceVersionCombo.getText() != null
 									&& !serviceVersionCombo.getText().trim()
-											.equals("")) {
+											.equals(S_EMPTYSTRING)) {
 								params
 										.put(
 												SOSDataStoreFactory.SERVICE_VERSION.key,
@@ -449,7 +450,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 			final Combo c = (Combo) e.widget;
 			if (c.equals(serviceVersionCombo)) {
 				if (serviceVersionCombo.getText() != null
-						&& !serviceVersionCombo.getText().trim().equals("")) {
+						&& !serviceVersionCombo.getText().trim().equals(S_EMPTYSTRING)) {
 					params.put(SOSDataStoreFactory.SERVICE_VERSION.key,
 							serviceVersionCombo.getText().trim());
 				}

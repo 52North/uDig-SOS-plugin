@@ -73,6 +73,8 @@ import org.n52.udig.catalog.internal.sos.dataStore.config.SOSOperationType;
 public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		implements SelectionListener, ModifyListener {
 
+	private final static String S_EMPTYSTRING = "";
+	
 	protected static boolean dirtyBit = false;
 
 	private static final Logger LOGGER = LoggingHandler
@@ -134,7 +136,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	}
 
 	private String changedParameterValueViewer() {
-		String error = "";
+		String error = S_EMPTYSTRING;
 		try {
 			final String parameter = identifySelectedParameter();
 
@@ -175,7 +177,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 		// try {
 		final String parameterS = identifySelectedParameter();
-		if (parameterS == null || parameterS.trim().equals("")
+		if (parameterS == null || parameterS.trim().equals(S_EMPTYSTRING)
 				|| parameterS.equalsIgnoreCase(("optional"))
 				|| parameterS.equalsIgnoreCase("required")) {
 			parameterValueViewer.removeAll();
@@ -197,7 +199,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 				final TemporalValueDomain tvd = (TemporalValueDomain) pbID
 						.getValueDomain();
 				final List<ITime> possibleValues = tvd.getPossibleValues();
-				String text = "";
+				String text = S_EMPTYSTRING;
 				for (final ITime t : possibleValues) {
 					text += (t.toString());
 				}
@@ -219,7 +221,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 						spin1[0].setSelection(timePeriod.getStart().getDay());
 						spin1[1].setSelection(timePeriod.getStart().getMonth());
-						spin1[2].setSelection(Integer.parseInt(""
+						spin1[2].setSelection(Integer.parseInt(S_EMPTYSTRING
 								+ timePeriod.getStart().getYear()));
 						spin1[3].setSelection(timePeriod.getStart().getHour());
 						spin1[4].setSelection(timePeriod.getStart().getMinute());
@@ -228,7 +230,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 						
 						spin2[0].setSelection(timePeriod.getEnd().getDay());
 						spin2[1].setSelection(timePeriod.getEnd().getMonth());
-						spin2[2].setSelection(Integer.parseInt(""
+						spin2[2].setSelection(Integer.parseInt(S_EMPTYSTRING
 								+ timePeriod.getEnd().getYear()));
 						spin2[3].setSelection(timePeriod.getEnd().getHour());
 						spin2[4].setSelection(timePeriod.getEnd().getMinute());
@@ -359,7 +361,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		featureIDLabel = new Label(featureIDcomposite, SWT.NONE);
 		featureIDLabel.setText("FeatureID:");
 		featureIDInputText = new Text(featureIDcomposite, SWT.SINGLE);
-		featureIDInputText.setText("");
+		featureIDInputText.setText(S_EMPTYSTRING);
 		featureIDInputText.setToolTipText("This text needs to be externalized");
 		featureIDInputText.addModifyListener(this);
 		if (getParams().get(SOSDataStoreFactory.OPERATION.key).equals(
@@ -472,19 +474,19 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		timebox.setVisible(false);
 
 		// headers
-		new Label(timebox, SWT.NONE).setText("");
+		new Label(timebox, SWT.NONE).setText(S_EMPTYSTRING);
 		new Label(timebox, SWT.NONE).setText("day");
 		new Label(timebox, SWT.NONE).setText("month");
 		new Label(timebox, SWT.NONE).setText("year");
-		new Label(timebox, SWT.NONE).setText("");
+		new Label(timebox, SWT.NONE).setText(S_EMPTYSTRING);
 		new Label(timebox, SWT.NONE).setText("hour");
-		new Label(timebox, SWT.NONE).setText("");
+		new Label(timebox, SWT.NONE).setText(S_EMPTYSTRING);
 		new Label(timebox, SWT.NONE).setText("minute");
-		new Label(timebox, SWT.NONE).setText("");
+		new Label(timebox, SWT.NONE).setText(S_EMPTYSTRING);
 		new Label(timebox, SWT.NONE).setText("second");
 
 		// line 1
-		new Label(timebox, SWT.NONE).setText("");
+		new Label(timebox, SWT.NONE).setText(S_EMPTYSTRING);
 		spin1[0] = new Spinner(timebox, SWT.WRAP);
 		spin1[1] = new Spinner(timebox, SWT.WRAP);
 		spin1[2] = new Spinner(timebox, SWT.WRAP);
@@ -496,7 +498,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		spin1[5] = new Spinner(timebox, SWT.WRAP);
 
 		// line 2
-		new Label(timebox, SWT.NONE).setText("");
+		new Label(timebox, SWT.NONE).setText(S_EMPTYSTRING);
 		spin2[0] = new Spinner(timebox, SWT.WRAP);
 		spin2[1] = new Spinner(timebox, SWT.WRAP);
 		spin2[2] = new Spinner(timebox, SWT.WRAP);
@@ -610,7 +612,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		if (e.widget instanceof Text) {
 			final Text t = (Text) e.widget;
 			if (t.equals(featureIDInputText)) {
-				String error = "";
+				String error = S_EMPTYSTRING;
 				if (t.getText().trim().length() > 0) {
 					try {
 						error = paramConf.setParameterValue("ObservationId", t
@@ -766,7 +768,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 	}
 
 	public void widgetSelected(final SelectionEvent event) {
-		String error = "";
+		String error = S_EMPTYSTRING;
 		if (event.widget instanceof Combo) {
 			final Combo eCombo = (Combo) event.widget;
 			if (eCombo.equals(offeringComboBox)){
@@ -790,7 +792,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 						.getValueDomain();
 				final List<ITime> possibleValues = tvd.getPossibleValues();
 
-				String text = "";
+				String text = S_EMPTYSTRING;
 
 				for (final ITime t : possibleValues) {
 					text += (t.toString());
@@ -835,7 +837,7 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 
 		if (error == null) {
 			setErrorMessage(null);
-		} else if (!error.equals("")) {
+		} else if (!error.equals(S_EMPTYSTRING)) {
 			setErrorMessage(error);
 			getWizard().getContainer().updateTitleBar();
 		}

@@ -21,6 +21,8 @@ public class Messages extends NLS {
 	public static String SOSWizardPage_connectionProblem;
 	public static String SOSWizardPage_error_invalidURL;
 	public static String SOSWizardPage_label_url_tooltip;
+	public static String SOSWizardPage_version_text;
+	public static String SOSWizardPage_version_text_tooltipp;
 	
 	public static String SOSServiceImpl_connecting_to;
 	public static String SOSServiceImpl_could_not_connect;

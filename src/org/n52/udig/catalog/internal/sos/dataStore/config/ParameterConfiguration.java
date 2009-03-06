@@ -69,24 +69,6 @@ public class ParameterConfiguration implements Serializable {
 	private static final Logger LOGGER = LoggingHandler
 			.getLogger(ParameterConfiguration.class);
 
-	public static void main(final String[] args) {
-		try {
-			final ParameterConfiguration pc = new ParameterConfiguration(
-					"doof", "url");
-			pc.addRequiredParameter(new Parameter("1", false,
-					new StringValueDomain(), "1"));
-			pc.setParameterValue("1", "erg1");
-			pc.addOptionalParameter(new Parameter("2", false,
-					new StringValueDomain(), "1"));
-			pc.setParameterValue("2", "erg2");
-			System.out.println(pc);
-			System.out.println(new ParameterConfiguration(pc.toString()));
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	private org.n52.oxf.owsCommon.capabilities.Contents contents = null;
 
 	private final String entryEND = "@";
