@@ -53,7 +53,6 @@ public class SOSConfigurationRegistry {
 	/**
 	 * current instance; singleton pattern
 	 */
-	// private static SOSConfigurationRegistry instance = null;
 	private static HashMap<String, SOSConfigurationRegistry> instances = new HashMap<String, SOSConfigurationRegistry>(
 			1);
 
@@ -62,15 +61,11 @@ public class SOSConfigurationRegistry {
 	private UDigSOSPluginDocument doc;
 	private final String filename;
 
-	// private SOSConfigurationRegistry(){
-	// this("sosConfiguration.xml");
-	// }
 
 	private SOSConfigurationRegistry(final String filename2) {
 		this.filename = filename2;
 		try {
-			doc = org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.Factory
-					.parse(new File(filename2));
+			doc = org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.Factory.parse(new File(filename2));
 		} catch (final IOException ioe) {
 			LOGGER.debug(
 					"Configurationfile cannot be opened, creating a new one",
@@ -247,8 +242,12 @@ public class SOSConfigurationRegistry {
 
 		return false;
 	}
-
-	public boolean getShowOperation(final String url, final String operationID) {
+	
+	public boolean getWorkaroundState(final String url, final String workaroundID){
+		return getShowOperation(url, "workaround "+workaroundID, false);
+	}
+	
+	private boolean getShowOperation(final String url, final String operationID, final boolean defaultValue) {
 		SOS sos;
 		try {
 			sos = getSOS(url);
@@ -267,8 +266,15 @@ public class SOSConfigurationRegistry {
 		if (op.getShowOperation() != null) {
 			return op.getShowOperation().getStringValue().equals("true");
 		}
+		return defaultValue;
+	}
 
-		return true;
+	public boolean getShowOperation(final String url, final String operationID) {
+		return getShowOperation(url, operationID, true);
+	}
+	
+	public void setWorkaroundState(final String url, final String workaroundId, final boolean state){
+		setShowOperation(url, "workaround "+workaroundId,state);
 	}
 
 	public void setShowOperation(final String url, final String operationID,

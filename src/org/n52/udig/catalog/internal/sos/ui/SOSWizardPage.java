@@ -163,20 +163,29 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		label.setToolTipText(Messages.SOSWizardPage_label_url_tooltip);
 		label.setLayoutData(new GridData(SWT.END, SWT.DEFAULT, false, false));
 
-		/*
-		 * url = new Text( composite, SWT.BORDER | SWT.SINGLE );
-		 * url.setLayoutData( new GridData(GridData.FILL_HORIZONTAL) );
-		 * url.setText( "http://" ); url.addModifyListener(this);
-		 */
 
 		String[] temp = settings.getArray(SOS_RECENTLY_USED_ID);
+//		String[] temp = null;
+		
 		if (temp == null) {
-			// fallback
-			temp = new String[3];
+			temp = new String[1];
 			temp[0] = S_EMPTYSTRING;
-//			temp[1] = "http://v-swe.uni-muenster.de:8080/HWS-SOS/sos";
-			temp[1] = "http://v-swe.uni-muenster.de:8080/WeatherSOS/sos";
-			temp[2] = "http://sensorweb.dlz-it-bvbs.bund.de/PegelOnlineSOS/sos";
+//			List<String> sos_l = SOSConfigurationRegistry.getInstance().getConfiguredSOSs();
+//			if (sos_l != null && !sos_l.isEmpty()){
+//				temp = new String[sos_l.size()+1];
+//				temp[0] = S_EMPTYSTRING;
+//				int i = 0;
+//				for (String s:sos_l){
+//					temp[++i] = s; 
+//				}
+//			} else{
+//				// fallback
+//				temp = new String[3];
+//				temp[0] = S_EMPTYSTRING;
+////				temp[1] = "http://v-swe.uni-muenster.de:8080/HWS-SOS/sos";
+//				temp[1] = "http://v-swe.uni-muenster.de:8080/WeatherSOS/sos";
+//				temp[2] = "http://sensorweb.dlz-it-bvbs.bund.de/PegelOnlineSOS/sos";	
+//			}
 		}
 
 		final List<String> recent = Arrays.asList(temp);
@@ -184,7 +193,7 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		gridData.widthHint = 400;
 
 		// For Drag 'n Drop as well as for general selections
-		// look for a url as part of the selction
+		// look for a url as part of the selection
 		final Map<String, Serializable> params = new HashMap<String, Serializable>(
 				1); // based on selection
 		URL selectedURL;
@@ -204,10 +213,24 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 		} else if (url != null && url.length() != 0) {
 			urlCombo.setText(url);
 		} else {
-			for (final String s : SOSConfigurationRegistry.getInstance()
-					.getConfiguredSOSs()) {
-				urlCombo.add(s);
+			String[] recentArray = settings.getArray(SOS_RECENTLY_USED_ID);
+			String[] newRecentArray = null;
+			
+			int i = 0;
+			if (recentArray != null){
+				newRecentArray = new String[recentArray.length+SOSConfigurationRegistry.getInstance().getConfiguredSOSs().size()];
+				for (String recentArray_S : recentArray){
+					newRecentArray[i++] = recentArray_S;
+				}
+			} else{
+				newRecentArray = new String[SOSConfigurationRegistry.getInstance().getConfiguredSOSs().size()];
 			}
+
+			for (final String s : SOSConfigurationRegistry.getInstance().getConfiguredSOSs()) {
+				urlCombo.add(s);
+				newRecentArray[i++] = s;
+			}
+			settings.put(SOS_RECENTLY_USED_ID, newRecentArray);
 		}
 		urlCombo.addModifyListener(this);
 		urlCombo.addSelectionListener(this);
@@ -256,20 +279,6 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 			red.dispose();
 		}
 	}
-
-//	/**
-//	 * @return the dataStore
-//	 */
-//	public DataStore getDataStore() {
-//		// .createDatastore uses a cache,
-//		try {
-//			return SOSDataStoreFactory.getInstance().createDataStore(
-//					getParameters());
-//		} catch (final IOException ioe) {
-//			LOGGER.fatal("Error creating datastore", ioe);
-//		}
-//		return null;
-//	}
 
 	protected Map<String, Serializable> getParameters() {
 		if (urlCombo == null) {

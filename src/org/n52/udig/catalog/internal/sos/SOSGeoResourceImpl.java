@@ -231,11 +231,12 @@ public class SOSGeoResourceImpl extends IGeoResource {
 				final Geometry g = ds.getBoundingBox(typename);
 				if (g != null) {
 					try {
-						// TIDO change this to g.getSRID
+						// TODO change this to g.getSRID
 						final String srid = "EPSG:" + 4326;
 						bounds = new ReferencedEnvelope(
 								new com.vividsolutions.jts.geom.Envelope(g
 										.getCoordinate()), CRS.decode(srid));
+						// WORKAROUND
 						bounds.expandToInclude(new Coordinate(
 								bounds.getMaxX() + 0.02,
 								bounds.getMaxY() + 0.02));

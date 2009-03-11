@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.AttributeType;
+import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -53,6 +54,7 @@ import org.n52.oxf.feature.dataTypes.OXFMeasureType;
 import org.n52.oxf.feature.dataTypes.OXFPhenomenonPropertyType;
 import org.n52.oxf.feature.dataTypes.OXFScopedName;
 import org.n52.oxf.util.LoggingHandler;
+import org.n52.udig.catalog.internal.sos.workarounds.EastingFirstWorkaroundDesc;
 import org.opengis.feature.FeatureAttributeDescriptor;
 
 /**
@@ -198,7 +200,6 @@ public class OXFFeatureConverter {
 							final OXFMeasureType oxftmt = ((OXFMeasureType) oxffeature
 									.getAttribute(name));
 							f.setAttribute(j, new MeasureType(oxftmt));
-
 						} else if (atd.getObjectClass().isAssignableFrom(
 								OXFScopedName.class)) {
 							final OXFScopedName oxfsn = ((OXFScopedName) oxffeature
@@ -215,7 +216,6 @@ public class OXFFeatureConverter {
 									.getAttribute(name))[0]);
 						}
 					} else {
-
 						if (atd.getObjectClass().isAssignableFrom(
 								OXFMeasureType.class)) {
 							final OXFMeasureType oxftmt = ((OXFMeasureType) oxffeature
@@ -287,8 +287,7 @@ public class OXFFeatureConverter {
 				}
 			} catch (final IllegalAttributeException iae) {
 				LOGGER.error(iae.getMessage());
-				LOGGER
-						.error("At least one feature is invalid. I`ll set this to null and try to proceed, however your data cannot be trusted anymore. Check your request and the resulting xml.");
+				LOGGER.error("At least one feature is invalid. I`ll set this to null and try to proceed, however your data cannot be trusted anymore. Check your request and the resulting xml.");
 				f = null;
 				throw iae;
 			} catch (final Exception e) {
@@ -397,7 +396,6 @@ public class OXFFeatureConverter {
 				if (build.getFeatureType() != null) {
 					// featureTypeCache.put(oxfft, build.getFeatureType());
 				}
-
 				return build.getFeatureType();
 			} catch (final Exception e) {
 				LOGGER.fatal(e);

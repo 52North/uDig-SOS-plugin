@@ -31,11 +31,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.n52.oxf.util.LoggingHandler;
 import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStoreFactory;
+import org.n52.udig.catalog.internal.sos.workarounds.EastingFirstWorkaroundDesc;
+import org.n52.udig.catalog.internal.sos.workarounds.FalseBoundingBoxWorkaroundDesc;
+import org.n52.udig.catalog.internal.sos.workarounds.IWorkaroundDescription;
+import org.n52.udig.catalog.internal.sos.workarounds.TransformCRSWorkaroundDesc;
 
 /**
  * General Configuration Uses java-properties-file to load and store the
@@ -88,7 +96,19 @@ public class GeneralConfigurationRegistryProperties extends
 	private static String filename;
 	private InputStream is;
 
+	private HashMap<String, IWorkaroundDescription> workarounds = new HashMap<String, IWorkaroundDescription>();
+		
 	public GeneralConfigurationRegistryProperties() {
+		// load dynamic workaround descriptions
+		EastingFirstWorkaroundDesc w1 = new EastingFirstWorkaroundDesc();
+		workarounds.put(w1.getIdentifier(),w1);
+		
+		TransformCRSWorkaroundDesc w2 = new TransformCRSWorkaroundDesc();
+		workarounds.put(w2.getIdentifier(),w2);
+		
+		FalseBoundingBoxWorkaroundDesc w3 = new FalseBoundingBoxWorkaroundDesc();
+		workarounds.put(w3.getIdentifier(), w3);
+		
 		try {
 			filename = new StringBuffer().
 			// append((new File("")).getAbsolutePath()).
@@ -99,6 +119,7 @@ public class GeneralConfigurationRegistryProperties extends
 							"UDIG-SOSPlugin.properties").toString();
 			is = new FileInputStream(filename);
 			properties.load(is);
+
 		} catch (final FileNotFoundException fnee) {
 			LOGGER.info("Configfile " + filename
 					+ " cannot be found, using default values");
@@ -263,6 +284,11 @@ public class GeneralConfigurationRegistryProperties extends
 	public void setProxyPort(final String port) {
 		properties.setProperty("proxyPort", port);
 
+	}
+
+	@Override
+	public HashMap<String, IWorkaroundDescription> getWorkarounds() {
+		return workarounds;
 	}
 	
 }

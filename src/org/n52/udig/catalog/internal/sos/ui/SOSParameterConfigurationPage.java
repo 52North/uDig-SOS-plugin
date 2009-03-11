@@ -844,10 +844,4 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 		getWizard().getContainer().updateButtons();
 
 	}
-	
-	public static void main(String[] args) {
-		float testzahl = 20.0f;
-		int testint = new Float(testzahl+0.5).intValue();
-		System.out.println(testint);
-	}
 }

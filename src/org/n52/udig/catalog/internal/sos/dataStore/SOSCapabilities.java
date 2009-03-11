@@ -63,14 +63,22 @@ import org.n52.oxf.serviceAdapters.sos.ISOSRequestBuilder;
 import org.n52.oxf.serviceAdapters.sos.SOSAdapter;
 import org.n52.oxf.util.LoggingHandler;
 import org.n52.udig.catalog.internal.sos.dataStore.config.GeneralConfigurationRegistry;
+import org.n52.udig.catalog.internal.sos.dataStore.config.SOSConfigurationRegistry;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSOperationType;
+import org.n52.udig.catalog.internal.sos.workarounds.FalseBoundingBoxWorkaroundDesc;
+import org.n52.udig.catalog.internal.sos.workarounds.NoCRSWorkaroundDesc;
+import org.n52.udig.catalog.internal.sos.workarounds.TransformCRSWorkaroundDesc;
 import org.opengis.metadata.citation.Address;
 import org.opengis.metadata.citation.Contact;
 import org.opengis.metadata.citation.OnLineResource;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Telephone;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opengis.util.InternationalString;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 class CapabilitiesCreator implements Callable<OperationResult> {
@@ -787,30 +795,46 @@ public class SOSCapabilities extends Capabilities {
 
 	private ReferencedEnvelope getBBoxFromOffering(final String typeName) {
 		for (int i = 0; i < oxfService.getContents()
-				.getDataIdentificationCount(); i++) {
+		.getDataIdentificationCount(); i++) {
 			if (oxfService.getContents().getDataIdentification(i)
 					.getIdentifier().equals(typeName)) {
-				String crs = oxfService.getContents().getDataIdentification(i)
-						.getAvailableCRSs()[0].toUpperCase();
-				// TODO what about other codes?
-				if (crs.contains("EPSG:")) {
-					crs = crs.substring(crs.indexOf("EPSG:"));
-					if (crs.equals("EPSG:0")){
-						crs = "EPSG:4326";
-					}
-				}
+				String crs = oxfService.getContents().getDataIdentification(i).getAvailableCRSs()[0].toUpperCase();
 
 				try {
-					final ReferencedEnvelope tempbbox = new ReferencedEnvelope(
+					if (crs.contains("EPSG:")) {
+						crs = crs.substring(crs.indexOf("EPSG:"));
+						if (crs.equals("EPSG:0")){
+							//WORKAROUND NO CRS
+							NoCRSWorkaroundDesc noCRSWorkaroundDesc = (NoCRSWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(NoCRSWorkaroundDesc.identifier);
+							crs = noCRSWorkaroundDesc.workaround(crs);
+						}			
+					}
+
+					ReferencedEnvelope tempbbox = new ReferencedEnvelope(
 							oxfService.getContents().getDataIdentification(i)
-									.getBoundingBoxes()[0].getLowerCorner()[1],
+							.getBoundingBoxes()[0].getLowerCorner()[1],
 							oxfService.getContents().getDataIdentification(i)
-									.getBoundingBoxes()[0].getUpperCorner()[1],
+							.getBoundingBoxes()[0].getUpperCorner()[1],
 							oxfService.getContents().getDataIdentification(i)
-									.getBoundingBoxes()[0].getLowerCorner()[0],
+							.getBoundingBoxes()[0].getLowerCorner()[0],
 							oxfService.getContents().getDataIdentification(i)
-									.getBoundingBoxes()[0].getUpperCorner()[0],
+							.getBoundingBoxes()[0].getUpperCorner()[0],
 							CRS.decode(crs));
+
+					if (SOSConfigurationRegistry.getInstance().getWorkaroundState(serviceURL.toExternalForm(), TransformCRSWorkaroundDesc.identifier)){
+						// WORKAROUND -> TRANSFORM CRS -> WGS84targetCRS
+						// TODO use parameters from settings
+						CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326");
+						TransformCRSWorkaroundDesc transformWorkaroundDesc = (TransformCRSWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(TransformCRSWorkaroundDesc.identifier);
+						tempbbox = transformWorkaroundDesc.workaround(tempbbox, targetCRS);
+					}
+
+					if (SOSConfigurationRegistry.getInstance().getWorkaroundState(serviceURL.toExternalForm(), FalseBoundingBoxWorkaroundDesc.identifier)){
+						// WORKAROUND Change BBOX
+						// TODO use parameters from settings
+						FalseBoundingBoxWorkaroundDesc falseBBoxWorkaroundDesc = (FalseBoundingBoxWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(FalseBoundingBoxWorkaroundDesc.identifier);
+						tempbbox = falseBBoxWorkaroundDesc.workaround(tempbbox);
+					}
 
 					return tempbbox;
 				} catch (final Exception e) {
@@ -822,8 +846,7 @@ public class SOSCapabilities extends Capabilities {
 		return null;
 	}
 
-	public ReferencedEnvelope getBoundingBox(final String operation,
-			final String typeName) {
+	public ReferencedEnvelope getBoundingBox(final String operation, final String typeName){
 		if (operation.equals(SOSOperations.opName_GetObservation)) {
 //			final ReferencedEnvelope re = getBBoxFromOffering(typeName.substring(0,typeName.indexOf("#")));
 			final ReferencedEnvelope re = getBBoxFromOffering(typeName);

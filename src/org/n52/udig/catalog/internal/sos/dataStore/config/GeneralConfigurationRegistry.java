@@ -27,8 +27,8 @@ Created: 27.05.2008
 package org.n52.udig.catalog.internal.sos.dataStore.config;
 
 import java.util.HashMap;
-
 import org.n52.oxf.serviceAdapters.sos.ISOSRequestBuilder;
+import org.n52.udig.catalog.internal.sos.workarounds.IWorkaroundDescription;
 
 /**
  * General Configuration
@@ -87,6 +87,8 @@ public abstract class GeneralConfigurationRegistry {
 	public abstract void setTimeToCacheDatastore(long l);
 
 	public abstract void setPreferedSOSVersion(String s);
+	
+	public abstract HashMap<String, IWorkaroundDescription> getWorkarounds();
 
 	private static HashMap<String, Character> parameterTypes = null;
 
