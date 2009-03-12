@@ -239,6 +239,9 @@ public class SOSParameterConfigurationPage extends AbstractUDIGImportPage
 				} else {
 					LOGGER.warn("NOT SUPPORTED");
 				}
+			} else{
+				timebox.setEnabled(false);
+				timebox.setVisible(false);
 			}
 
 			// check if a Parameter needs to be checked in Viewer

@@ -29,6 +29,7 @@ package org.n52.udig.catalog.internal.sos.ui;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -214,23 +215,31 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 			urlCombo.setText(url);
 		} else {
 			String[] recentArray = settings.getArray(SOS_RECENTLY_USED_ID);
-			String[] newRecentArray = null;
+			ArrayList<String> newRecentArray = null;
 			
 			int i = 0;
 			if (recentArray != null){
-				newRecentArray = new String[recentArray.length+SOSConfigurationRegistry.getInstance().getConfiguredSOSs().size()];
+//				newRecentArray = new String[recentArray.length+SOSConfigurationRegistry.getInstance().getConfiguredSOSs().size()];
+				newRecentArray = new ArrayList<String>(recentArray.length+SOSConfigurationRegistry.getInstance().getConfiguredSOSs().size());
+				
 				for (String recentArray_S : recentArray){
-					newRecentArray[i++] = recentArray_S;
+					if (!newRecentArray.contains(recentArray_S)){
+						newRecentArray.add(recentArray_S);	
+					}
 				}
 			} else{
-				newRecentArray = new String[SOSConfigurationRegistry.getInstance().getConfiguredSOSs().size()];
+				newRecentArray = new ArrayList<String>(SOSConfigurationRegistry.getInstance().getConfiguredSOSs().size());
 			}
 
 			for (final String s : SOSConfigurationRegistry.getInstance().getConfiguredSOSs()) {
-				urlCombo.add(s);
-				newRecentArray[i++] = s;
+				if (!newRecentArray.contains(s)){
+					urlCombo.add(s);
+					newRecentArray.add(s);	
+				}
 			}
-			settings.put(SOS_RECENTLY_USED_ID, newRecentArray);
+
+			String[] a = new String[newRecentArray.size()];
+			settings.put(SOS_RECENTLY_USED_ID, newRecentArray.toArray(a));
 		}
 		urlCombo.addModifyListener(this);
 		urlCombo.addSelectionListener(this);
@@ -257,13 +266,11 @@ public class SOSWizardPage extends AbstractUDIGImportPage implements
 				3));
 
 		label = new Label(composite, SWT.NONE);
-		label
-				.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT, false,
+		label.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT, false,
 						false));
 
 		label = new Label(composite, SWT.NONE);
-		label
-				.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT, false,
+		label.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT, false,
 						false));
 
 		urlCombo.addModifyListener(this);

@@ -45,6 +45,9 @@ import org.n52.udig.catalog.internal.sos.dataStore.SOSCapabilities;
 import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStore;
 import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStoreFactory;
 import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStoreFactory.UDIGSOSDataStore;
+import org.n52.udig.catalog.internal.sos.dataStore.config.GeneralConfigurationRegistry;
+import org.n52.udig.catalog.internal.sos.dataStore.config.SOSConfigurationRegistry;
+import org.n52.udig.catalog.internal.sos.workarounds.EastingFirstWorkaroundDesc;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -228,24 +231,35 @@ public class SOSGeoResourceImpl extends IGeoResource {
 			bounds = caps.getBoundingBox((String) parent.getParams().get(
 					SOSDataStoreFactory.OPERATION.key), typename);
 			if (bounds == null) {
-				final Geometry g = ds.getBoundingBox(typename);
+				Geometry g = ds.getBoundingBox(typename);
 				if (g != null) {
 					try {
+						if (SOSConfigurationRegistry.getInstance().getWorkaroundState(caps.getServiceURL().toExternalForm(), EastingFirstWorkaroundDesc.identifier)){
+							EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
+							// OXFSamplingPointType umgedreht
+							
+							g = eastingFirstWorkaroundDesc.workaround(g); 
+						}
+						
 						// TODO change this to g.getSRID
 						final String srid = "EPSG:" + 4326;
 						bounds = new ReferencedEnvelope(
 								new com.vividsolutions.jts.geom.Envelope(g
 										.getCoordinate()), CRS.decode(srid));
 						// WORKAROUND
+
 						bounds.expandToInclude(new Coordinate(
 								bounds.getMaxX() + 0.02,
 								bounds.getMaxY() + 0.02));
+						bounds.expandToInclude(new Coordinate(
+								bounds.getMinX() - 0.02,
+								bounds.getMinY() - 0.02));
+
 						// g.getEnvelope();
 					} catch (final Exception e) {
 						e.printStackTrace();
 					}
 				}
-
 			}
 			// crs = bounds.getCoordinateReferenceSystem();
 			name = typename;

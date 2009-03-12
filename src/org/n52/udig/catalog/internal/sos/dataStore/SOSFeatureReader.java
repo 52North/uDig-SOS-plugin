@@ -300,7 +300,7 @@ public class SOSFeatureReader implements FeatureReader {
 			if (SOSConfigurationRegistry.getInstance().getWorkaroundState(((URL)params.get(SOSDataStoreFactory.URL_SERVICE.key)).toExternalForm(), EastingFirstWorkaroundDesc.identifier)){
 				EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
 				// OXFSamplingPointType umgedreht
-				f2 = eastingFirstWorkaroundDesc.workaround(f2); 
+				f2 = eastingFirstWorkaroundDesc.workaround(f2);
 			}
 			return f2;
 		} else {

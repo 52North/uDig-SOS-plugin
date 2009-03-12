@@ -263,13 +263,10 @@ public class OXFFeatureConverter {
 						} else if (at.getType().isAssignableFrom(
 								com.vividsolutions.jts.geom.Geometry.class)) {
 							if (oxffeature.getAttribute(name) != null) {
-								f.setAttribute(j, (oxffeature
-										.getAttribute(name)));
+								f.setAttribute(j, (oxffeature.getAttribute(name)));
 								// place where geometries could be stored
 								if (!isGeometrySet) {
-									f
-											.setDefaultGeometry(((com.vividsolutions.jts.geom.Geometry) oxffeature
-													.getAttribute(name)));
+									f.setDefaultGeometry(((com.vividsolutions.jts.geom.Geometry) oxffeature.getAttribute(name)));
 									isGeometrySet = true;
 								}
 							}

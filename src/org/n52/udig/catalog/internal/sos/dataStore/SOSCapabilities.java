@@ -65,6 +65,7 @@ import org.n52.oxf.util.LoggingHandler;
 import org.n52.udig.catalog.internal.sos.dataStore.config.GeneralConfigurationRegistry;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSConfigurationRegistry;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSOperationType;
+import org.n52.udig.catalog.internal.sos.workarounds.EastingFirstWorkaroundDesc;
 import org.n52.udig.catalog.internal.sos.workarounds.FalseBoundingBoxWorkaroundDesc;
 import org.n52.udig.catalog.internal.sos.workarounds.NoCRSWorkaroundDesc;
 import org.n52.udig.catalog.internal.sos.workarounds.TransformCRSWorkaroundDesc;
@@ -812,15 +813,23 @@ public class SOSCapabilities extends Capabilities {
 
 					ReferencedEnvelope tempbbox = new ReferencedEnvelope(
 							oxfService.getContents().getDataIdentification(i)
-							.getBoundingBoxes()[0].getLowerCorner()[1],
-							oxfService.getContents().getDataIdentification(i)
-							.getBoundingBoxes()[0].getUpperCorner()[1],
-							oxfService.getContents().getDataIdentification(i)
 							.getBoundingBoxes()[0].getLowerCorner()[0],
 							oxfService.getContents().getDataIdentification(i)
 							.getBoundingBoxes()[0].getUpperCorner()[0],
+							oxfService.getContents().getDataIdentification(i)
+							.getBoundingBoxes()[0].getLowerCorner()[1],
+							oxfService.getContents().getDataIdentification(i)
+							.getBoundingBoxes()[0].getUpperCorner()[1],
 							CRS.decode(crs));
 
+					if (SOSConfigurationRegistry.getInstance().getWorkaroundState(serviceURL.toExternalForm(), EastingFirstWorkaroundDesc.identifier)){
+						EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
+						// OXFSamplingPointType umgedreht
+						
+						tempbbox = eastingFirstWorkaroundDesc.workaround(tempbbox); 
+					}
+					
+					
 					if (SOSConfigurationRegistry.getInstance().getWorkaroundState(serviceURL.toExternalForm(), TransformCRSWorkaroundDesc.identifier)){
 						// WORKAROUND -> TRANSFORM CRS -> WGS84targetCRS
 						// TODO use parameters from settings
@@ -943,5 +952,9 @@ public class SOSCapabilities extends Capabilities {
 	 */
 	protected void setLastUpdated(final long lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+
+	public final URL getServiceURL() {
+		return serviceURL;
 	}
 }
