@@ -26,7 +26,14 @@ Created: 27.05.2008
  *********************************************************************************/
 package org.n52.udig.catalog.internal.sos.dataStore.config;
 
+import java.util.HashMap;
+
 import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStoreFactory;
+import org.n52.udig.catalog.internal.sos.workarounds.EastingFirstWorkaroundDesc;
+import org.n52.udig.catalog.internal.sos.workarounds.FalseBoundingBoxWorkaroundDesc;
+import org.n52.udig.catalog.internal.sos.workarounds.IWorkaroundDescription;
+import org.n52.udig.catalog.internal.sos.workarounds.NoCRSWorkaroundDesc;
+import org.n52.udig.catalog.internal.sos.workarounds.TransformCRSWorkaroundDesc;
 
 /**
  * General Configuration Uses static strings load the configuration
@@ -38,7 +45,20 @@ public class GeneralConfigurationRegistryS extends GeneralConfigurationRegistry 
 	private final static String SOSconfigurationFilename = "sosConfiguration.xml";
 	private final static String log4jPropertiesFilename = "D:\\\\Java\\log4j.properties";
 
+	private HashMap<String, IWorkaroundDescription> workarounds = new HashMap<String, IWorkaroundDescription>();
+	
 	protected GeneralConfigurationRegistryS() {
+		EastingFirstWorkaroundDesc w1 = new EastingFirstWorkaroundDesc();
+		workarounds.put(w1.getIdentifier(),w1);
+		
+		TransformCRSWorkaroundDesc w2 = new TransformCRSWorkaroundDesc();
+		workarounds.put(w2.getIdentifier(),w2);
+		
+		FalseBoundingBoxWorkaroundDesc w3 = new FalseBoundingBoxWorkaroundDesc();
+		workarounds.put(w3.getIdentifier(), w3);
+		
+		NoCRSWorkaroundDesc w4 = new NoCRSWorkaroundDesc();
+		workarounds.put(w4.getIdentifier(), w4);
 
 	}
 
@@ -146,6 +166,11 @@ public class GeneralConfigurationRegistryS extends GeneralConfigurationRegistry 
 	public void setProxyPort(final String port) {
 		throw new UnsupportedOperationException(
 				"Configuration Registry does not support write");
+	}
+	
+	@Override
+	public HashMap<String, IWorkaroundDescription> getWorkarounds() {
+		return workarounds;
 	}
 
 }

@@ -43,6 +43,7 @@ import org.n52.udig.catalog.internal.sos.dataStore.SOSDataStoreFactory;
 import org.n52.udig.catalog.internal.sos.workarounds.EastingFirstWorkaroundDesc;
 import org.n52.udig.catalog.internal.sos.workarounds.FalseBoundingBoxWorkaroundDesc;
 import org.n52.udig.catalog.internal.sos.workarounds.IWorkaroundDescription;
+import org.n52.udig.catalog.internal.sos.workarounds.NoCRSWorkaroundDesc;
 import org.n52.udig.catalog.internal.sos.workarounds.TransformCRSWorkaroundDesc;
 
 /**
@@ -108,6 +109,9 @@ public class GeneralConfigurationRegistryProperties extends
 		
 		FalseBoundingBoxWorkaroundDesc w3 = new FalseBoundingBoxWorkaroundDesc();
 		workarounds.put(w3.getIdentifier(), w3);
+		
+		NoCRSWorkaroundDesc w4 = new NoCRSWorkaroundDesc();
+		workarounds.put(w4.getIdentifier(), w4);
 		
 		try {
 			filename = new StringBuffer().
