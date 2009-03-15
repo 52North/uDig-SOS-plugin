@@ -856,13 +856,26 @@ public class SOSCapabilities extends Capabilities {
 						// TODO use parameters from settings
 //						TransformCRSWorkaroundDesc transformWorkaroundDesc = (TransformCRSWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(TransformCRSWorkaroundDesc.identifier);
 						
-						EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
+//						EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
 
+						TransformCRSWorkaroundDesc transcrsworkDesc = (TransformCRSWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(TransformCRSWorkaroundDesc.identifier);
 //						CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326");
-						CoordinateReferenceSystem targetCRS = CRS.decode(SOSConfigurationRegistry.getInstance().getWorkaroundParameter(
+//						CoordinateReferenceSystem targetCRS = CRS.decode(SOSConfigurationRegistry.getInstance().getWorkaroundParameter(
+//								serviceURL.toExternalForm(),
+//								EastingFirstWorkaroundDesc.identifier, 
+//								eastingFirstWorkaroundDesc.getParameters()[0].key));
+//						tempbbox = TransformCRSWorkaroundDesc.workaround(tempbbox, targetCRS);
+						CoordinateReferenceSystem targetCRS = null;
+						try {
+								targetCRS = CRS.decode(SOSConfigurationRegistry.getInstance().getWorkaroundParameter(
 								serviceURL.toExternalForm(),
-								EastingFirstWorkaroundDesc.identifier, 
-								eastingFirstWorkaroundDesc.getParameters()[0].key));
+								TransformCRSWorkaroundDesc.identifier, 
+								transcrsworkDesc.getParameters()[0].key));
+						} catch (org.opengis.referencing.NoSuchAuthorityCodeException e) {
+							targetCRS = CRS.decode(
+									(String)transcrsworkDesc.getDefaultValue(transcrsworkDesc.getParameters()[0]));
+						}
+						
 						tempbbox = TransformCRSWorkaroundDesc.workaround(tempbbox, targetCRS);
 					}
 
