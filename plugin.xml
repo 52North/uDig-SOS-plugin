@@ -29,7 +29,7 @@
       </wizardPage>
       <wizardPage
             class="org.n52.udig.catalog.internal.sos.ui.SOSParameterConfigurationPage"
-            description="Select the offering and set parameters; &quot;left: select your parameters; right select parameter values; next button is disabled untli all parameters are configured&quot;"
+            description="Select the offering and set parameters; left: select your parameters; right select parameter values; next button is disabled until all parameters are configured"
             name="ConfigureParameters">
       </wizardPage>
    </extension>
