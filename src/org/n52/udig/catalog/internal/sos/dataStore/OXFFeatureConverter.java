@@ -34,7 +34,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.AttributeType;
-import org.geotools.feature.AttributeTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureType;
@@ -54,7 +53,6 @@ import org.n52.oxf.feature.dataTypes.OXFMeasureType;
 import org.n52.oxf.feature.dataTypes.OXFPhenomenonPropertyType;
 import org.n52.oxf.feature.dataTypes.OXFScopedName;
 import org.n52.oxf.util.LoggingHandler;
-import org.n52.udig.catalog.internal.sos.workarounds.EastingFirstWorkaroundDesc;
 import org.opengis.feature.FeatureAttributeDescriptor;
 
 /**

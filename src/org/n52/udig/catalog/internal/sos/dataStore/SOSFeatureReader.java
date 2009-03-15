@@ -49,15 +49,12 @@ import org.n52.oxf.serviceAdapters.OperationResult;
 import org.n52.oxf.serviceAdapters.ParameterContainer;
 import org.n52.oxf.serviceAdapters.sos.SOSAdapter;
 import org.n52.oxf.util.LoggingHandler;
-import org.n52.udig.catalog.internal.sos.dataStore.config.GeneralConfigurationRegistry;
 import org.n52.udig.catalog.internal.sos.dataStore.config.ParameterConfiguration;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSConfigurationRegistry;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSOperationType;
 import org.n52.udig.catalog.internal.sos.workarounds.EastingFirstWorkaroundDesc;
-import org.n52.udig.catalog.internal.sos.workarounds.TransformCRSWorkaroundDesc;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author <a href="mailto:priess@52north.org">Carsten Priess</a>
@@ -298,9 +295,9 @@ public class SOSFeatureReader implements FeatureReader {
 			}
 			Feature f2 = OXFFeatureConverter.convert(f);
 			if (SOSConfigurationRegistry.getInstance().getWorkaroundState(((URL)params.get(SOSDataStoreFactory.URL_SERVICE.key)).toExternalForm(), EastingFirstWorkaroundDesc.identifier)){
-				EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
+//				EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
 				// OXFSamplingPointType umgedreht
-				f2 = eastingFirstWorkaroundDesc.workaround(f2);
+				EastingFirstWorkaroundDesc.workaround(f2);
 			}
 			return f2;
 		} else {

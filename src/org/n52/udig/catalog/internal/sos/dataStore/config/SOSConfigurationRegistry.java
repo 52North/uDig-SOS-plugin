@@ -43,7 +43,9 @@ import org.n52.udig.catalog.internal.sos.dataStore.SOSCapabilities;
 import org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument;
 import org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS;
 import org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Operation;
+import org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Workaround;
 import org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Operation.Parameter;
+
 
 /**
  * @author Carsten Priess
@@ -170,9 +172,32 @@ public class SOSConfigurationRegistry {
 		op.setName(XmlString.Factory.newValue(operationID));
 		return op;
 	}
+	
+	private Workaround createWorkaround(final SOS sos, final String workaroundID) {
+		for (final Workaround w : sos.getWorkaroundArray()) {
+			if (w.getId().equals(workaroundID)) {
+				LOGGER.warn("This shouldn't happen");
+				return w;
+			}
+		}
+		final Workaround wa = sos.addNewWorkaround();
+		wa.setId(XmlString.Factory.newValue(workaroundID));
+		return wa;
+	}
+	
+	
+	private Workaround getWorkaround(final SOS sos, final String workaroundID)	throws NoSuchElementException {
+		final Workaround[] workarounds = sos.getWorkaroundArray();
+		for (final Workaround w : workarounds){
+			if (w.getId().getStringValue().equals(workaroundID)){
+				return w;
+			}
+		}
+		return createWorkaround(sos, workaroundID);
+	}
 
 	private Operation getOperation(final SOS sos, final String operationID)
-			throws NoSuchElementException {
+	throws NoSuchElementException {
 
 		final Operation opArray[] = sos.getOperationArray();
 		for (final Operation op : opArray) {
@@ -192,7 +217,21 @@ public class SOSConfigurationRegistry {
 		}
 		return createSOS(url);
 	}
+	
+	
 
+	private org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Workaround.Parameter getWorkaroundParameter(final Workaround workaround,
+			final String parameterID) throws NoSuchElementException {
+		final org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Workaround.Parameter parameterArray[] = workaround.getParameterArray();
+		for (final org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Workaround.Parameter p : parameterArray) {
+			if (p.getId().getStringValue().equals(parameterID)) {
+				return p;
+			}
+		}
+		throw new NoSuchElementException("Parameter with ID " + parameterID
+				+ " cannot be found in configfile");
+	}
+	
 	private Parameter getParameter(final Operation operation,
 			final String parameterID) throws NoSuchElementException {
 		final Parameter parameterArray[] = operation.getParameterArray();
@@ -208,6 +247,13 @@ public class SOSConfigurationRegistry {
 	private Parameter createParameter(final Operation operation,
 			final String parameterID) {
 		final Parameter p = operation.addNewParameter();
+		p.setId(XmlString.Factory.newValue(parameterID));
+		return p;
+	}
+	
+	private org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Workaround.Parameter createWorkaroundParameter(final Workaround workaround,
+			final String parameterID) {
+		final org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Workaround.Parameter p = workaround.addNewParameter();
 		p.setId(XmlString.Factory.newValue(parameterID));
 		return p;
 	}
@@ -244,7 +290,24 @@ public class SOSConfigurationRegistry {
 	}
 	
 	public boolean getWorkaroundState(final String url, final String workaroundID){
-		return getShowOperation(url, "workaround "+workaroundID, false);
+		SOS sos;
+		try {
+			sos = getSOS(url);
+		} catch (final NoSuchElementException nsee1) {
+			sos = createSOS(url);
+		}
+
+		Workaround w = getWorkaround(sos, workaroundID); 
+		
+		if (w != null){
+			if (w.getEnabled() != null) {
+				String s = w.getEnabled().getStringValue();
+				return s.equals("true");
+			}
+		}
+
+		return false;
+//		getShowOperationuz(url, "workaround "+workaroundID, false);
 	}
 	
 	private boolean getShowOperation(final String url, final String operationID, final boolean defaultValue) {
@@ -274,7 +337,21 @@ public class SOSConfigurationRegistry {
 	}
 	
 	public void setWorkaroundState(final String url, final String workaroundId, final boolean state){
-		setShowOperation(url, "workaround "+workaroundId,state);
+//		setShowOperation(url, "workaround "+workaroundId,state);
+		Workaround wa = null;
+		try {
+			wa = getWorkaround(getSOS(url), workaroundId);
+		} catch (final NoSuchElementException nseee1) {
+			wa = createWorkaround(getSOS(url), workaroundId);
+		}
+		if (wa.getEnabled() == null) {
+			wa.addNewEnabled();
+		}
+		if (state) {
+			wa.getEnabled().setStringValue("true");
+		} else {
+			wa.getEnabled().setStringValue("false");
+		}
 	}
 
 	public void setShowOperation(final String url, final String operationID,
@@ -389,6 +466,32 @@ public class SOSConfigurationRegistry {
 
 	// }
 
+	public String getWorkaroundParameter(final String url, final String workaroundID,
+			final String parameterID) {
+		Workaround wa = null;
+		try {
+			wa = getWorkaround(getSOS(url), workaroundID);
+		} catch (final NoSuchElementException nseee1) {
+			wa = createWorkaround(getSOS(url), workaroundID);
+		}
+
+		org.x52N.schema.xmlConfigSchema.UDigSOSPluginDocument.UDigSOSPlugin.SOS.Workaround.Parameter p = null;
+		try {
+			p = getWorkaroundParameter(wa, parameterID);
+		} catch (final NoSuchElementException nseee1) {
+			p = createWorkaroundParameter(wa, parameterID);
+		}
+
+		// String returnArray[] = new String[p.getValueArray().length];
+		// int i=0;
+		// for(String value:p.getValueArray()){
+		// returnArray[i++] = value;
+		// }
+		// return returnArray;
+//		getValueArray();
+		return p.xmlText();
+	}
+	
 	public String[] getParameter(final String url, final String operationID,
 			final String parameterID) {
 		Operation op = null;

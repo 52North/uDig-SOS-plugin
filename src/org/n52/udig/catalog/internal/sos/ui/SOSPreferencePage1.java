@@ -53,10 +53,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.geotools.data.DataStoreFactorySpi.Param;
 import org.geotools.data.ows.OperationType;
 import org.n52.oxf.owsCommon.capabilities.IDiscreteValueDomain;
 import org.n52.oxf.owsCommon.capabilities.Parameter;
@@ -68,6 +70,7 @@ import org.n52.udig.catalog.internal.sos.dataStore.config.ParameterConfiguration
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSConfigurationRegistry;
 import org.n52.udig.catalog.internal.sos.dataStore.config.SOSOperationType;
 import org.n52.udig.catalog.internal.sos.workarounds.IWorkaroundDescription;
+import org.n52.udig.catalog.internal.sos.workarounds.TransformCRSWorkaroundDesc;
 import org.n52.udig.catalog.sos.internal.Messages;
 
 /**
@@ -106,6 +109,8 @@ public class SOSPreferencePage1 extends PreferencePage implements
 	private Tree operationsTree;
 	private Tree valueTree;
 	private final static String workarounds_s = "Workarounds";
+//	private Combo customCombo;
+//	private Text customDesc;
 	// private Text description;
 
 	Composite valueBlock;
@@ -202,6 +207,15 @@ public class SOSPreferencePage1 extends PreferencePage implements
 			lab1.setText("Select your parameters to configure");
 			new Label(configurationBlock, SWT.NONE).setText("");
 			operationsTree = new Tree(configurationBlock, SWT.SINGLE | SWT.BORDER);
+			
+//			customCombo = new Combo(configurationBlock, SWT.BORDER);
+//			customCombo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+//			customCombo.setVisibleItemCount(10);
+//			customCombo.addSelectionListener(this);
+//			customCombo.add("");
+//			customCombo.setVisible(false);
+//			customCombo.setEnabled(false);
+			
 			// tree.setVisible(false);
 			// tree.setEnabled(false);
 			operationsTree.setItemCount(10);
@@ -220,16 +234,14 @@ public class SOSPreferencePage1 extends PreferencePage implements
 			labShowOp.setText("Enable:");
 			showTag = new Button(btBlock, SWT.CHECK);
 			showTag.addSelectionListener(this);
-			showTag
-					.setToolTipText(Messages.SOSPreferencePage1_show_operation_tooltipp);
+			showTag.setToolTipText(Messages.SOSPreferencePage1_show_operation_tooltipp);
 			
 
 			final Label lab3 = new Label(btBlock, SWT.NONE);
 			lab3.setText("Omit Parameter:");
 			omitTag = new Button(btBlock, SWT.CHECK);
 			omitTag.addSelectionListener(this);
-			omitTag
-					.setToolTipText(Messages.SOSPreferencePage1_omit_parameter_tooltipp);
+			omitTag.setToolTipText(Messages.SOSPreferencePage1_omit_parameter_tooltipp);
 
 			valueTree = new Tree(valueBlock, SWT.CHECK | SWT.BORDER);
 			valueTree.setItemCount(6);
@@ -300,137 +312,183 @@ public class SOSPreferencePage1 extends PreferencePage implements
 	}
 
 	private String identifySelectedOperation() {
-		if (operationsTree.getSelection() != null && operationsTree.getSelection()[0] != null) {
+		if (operationsTree.getSelection() != null
+				&& operationsTree.getSelection()[0] != null) {
 			final TreeItem selectedItem = operationsTree.getSelection()[0];
 			// identify the operation we are in
 			TreeItem currentOperationItem = selectedItem;
 			while (currentOperationItem.getParentItem() != null) {
-				currentOperationItem = currentOperationItem.getParentItem();
+				if (currentOperationItem.getParentItem().getText().equals(workarounds_s)){
+					return currentOperationItem.getText();
+				} else{
+					currentOperationItem = currentOperationItem.getParentItem();	
+				}
 			}
-			return currentOperationItem.getText();
+			if (currentOperationItem.getText().equals(workarounds_s)){
+				return selectedItem.getText();
+			} else return currentOperationItem.getText();
 		} else {
 			return null;
 		}
 	}
 
 	private String identifySelectedParameter() {
-		if (operationsTree.getSelection() != null && operationsTree.getSelection()[0] != null) {
-			if (operationsTree.getSelection()[0].getItemCount() == 0) {
+		if (operationsTree.getSelection() != null
+				&& operationsTree.getSelection()[0] != null) {
+			
+			if (GeneralConfigurationRegistry.getInstance().getWorkarounds().containsKey(identifySelectedOperation())){
+				if (operationsTree.getSelection()[0].getItemCount() == 0 ) {
+					if (GeneralConfigurationRegistry.getInstance().getWorkarounds().containsKey(operationsTree.getSelection()[0].getText())){
+						return null;
+					} else return operationsTree.getSelection()[0].getText();
+				}
+			} else{			
+				if (operationsTree.getSelection()[0].getItemCount() == 0 ) {
 				return operationsTree.getSelection()[0].getText();
 			}
+			}
 		}
-
 		return null;
 		// if itemCount == 0 we have a parameterid
 	}
+
+	// if (selectedOperation.equals(workarounds_s)){
+	// omitTag.setEnabled(false);
+	// showTag.setEnabled(false);
+	// valueTree.removeAll();
+	// // if itemCount == 0 we may have a parameterid
+	//		
+	// if (selectedItem.getItemCount() == 0){
+	// IWorkaroundDescription workarounddesc =
+	// GeneralConfigurationRegistry.getInstance().getWorkarounds().get(selectedItem.getText());
+	// Param[] workaroundparams = workarounddesc.getParameters();
+	//			
+	// if (workarounddesc != null){
+	// SOSConfigurationRegistry.getInstance().getWorkaroundState(serviceURL.toExternalForm(),
+	// TransformCRSWorkaroundDesc.identifier)
+	// showTag.setVisible(true);
+	// showTag.setEnabled(true);
+	// showTag.setSelection(SOSConfigurationRegistry.getInstance()
+	// .getWorkaroundState(urlCombo.getText(),
+	// identifySelectedParameter()));
+	// int i = 0;
+	// for (Param p:workaroundparams){
+	// valueTree.setItemCount(workarounddesc.getParameters().length);
+	// }
+	// }
+	// }
+	// }
+	//		
+	// valueBlock.setVisible(true);
+	// // valueTree.setVisible(false);
+	//
+	// } else{
 
 	public void widgetSelected(final SelectionEvent e) {
 		// treelistener
 		if (e.widget instanceof Tree) {
 			final Tree t = (Tree) e.widget;
 			if (t.equals(operationsTree)) {
-				if (operationsTree.getSelection() != null
-						&& operationsTree.getSelection()[0] != null) {
-
+				if (operationsTree.getSelection() != null && operationsTree.getSelection()[0] != null) {
 					String selectedOperation = identifySelectedOperation();
 					final TreeItem selectedItem = operationsTree.getSelection()[0];
 
-					if (selectedOperation.equals(workarounds_s)){
-						omitTag.setEnabled(false);
-						showTag.setEnabled(false);
-
-						// if itemCount == 0 we may have a parameterid
-						if (selectedItem.getItemCount() == 0){
-							IWorkaroundDescription workarounddesc = GeneralConfigurationRegistry.getInstance().getWorkarounds().get(selectedItem.getText());
-							if (workarounddesc != null){
-								if (workarounddesc.booleanType()){
-									showTag.setVisible(true);
-									showTag.setEnabled(true);
-									showTag.setSelection(SOSConfigurationRegistry.getInstance()
-											.getWorkaroundState(urlCombo.getText(),
-													identifySelectedParameter()));	
-								}
-							}
-						}
-						
-						valueBlock.setVisible(true);
-						valueTree.removeAll();
-//						valueTree.setVisible(false);
-
-					} else{
+					if (GeneralConfigurationRegistry.getInstance()
+							.getWorkarounds().containsKey(selectedOperation)) {
+						showTag.setSelection(SOSConfigurationRegistry
+								.getInstance().getWorkaroundState(
+										urlCombo.getText(), selectedOperation));
 						showTag.setEnabled(true);
 						showTag.setVisible(true);
-						showTag.setSelection(SOSConfigurationRegistry.getInstance()
-								.getShowOperation(urlCombo.getText(),
-										selectedOperation));
-						showTag.setEnabled(true);
-						valueBlock.setVisible(true);
+					} else {
+						showTag.setSelection(SOSConfigurationRegistry
+								.getInstance().getShowOperation(
+										urlCombo.getText(), selectedOperation));
+						if (selectedOperation != workarounds_s){
+							showTag.setEnabled(true);
+							showTag.setVisible(true);
+						} else {showTag.setEnabled(false);}
+					}
+
+					valueBlock.setVisible(true);
 					
 
-						// if itemCount == 0 we may have a parameterid
-						if (selectedItem.getItemCount() == 0
-								&& getParametersAsStrings(
-										selectedOperation).contains(
-												identifySelectedParameter())) {
-							omitTag.setEnabled(true);
-							try {
-								omitTag.setSelection(SOSConfigurationRegistry
-										.getInstance().getOmitParameter(
-												urlCombo.getText(),
-												selectedOperation,
-												identifySelectedParameter()));
-							} catch (final NoSuchElementException nsee1) {
-								omitTag.setSelection(false);
-							}
+					// if itemCount == 0 we may have a parameterid
+					if (selectedItem.getItemCount() == 0) {
+						String selectedParameter = identifySelectedParameter();
+						
+						if (GeneralConfigurationRegistry.getInstance().getWorkarounds().containsKey(selectedOperation)) {
+							// Workarounds
+							showTag.setEnabled(true);
+							showTag.setVisible(true);
+							omitTag.setEnabled(false);
 							valueTree.removeAll();
+							
+							
+						} else {
+							// Operations
+							boolean proceed = false;
+							proceed = getParametersAsStrings(selectedOperation).contains(selectedParameter);
+							if (proceed) {
+								omitTag.setEnabled(true);
+								try {
+									omitTag.setSelection(SOSConfigurationRegistry
+													.getInstance()
+													.getOmitParameter(
+															urlCombo.getText(),
+															selectedOperation,
+															identifySelectedParameter()));
+								} catch (final NoSuchElementException nsee1) {
+									omitTag.setSelection(false);
+								}
+								valueTree.removeAll();
 
-							final List<org.n52.oxf.owsCommon.capabilities.Parameter> p = getParameters(selectedOperation);
-							IDiscreteValueDomain<String> idvd;
+								final List<org.n52.oxf.owsCommon.capabilities.Parameter> p = getParameters(selectedOperation);
+								IDiscreteValueDomain<String> idvd;
 
-							for (final Parameter parm : p) {
-								if (parm.getServiceSidedName().equals(
-										selectedItem.getText())) {
-									if (parm.getValueDomain() instanceof IDiscreteValueDomain) {
-										final String[] selectedValueItems = SOSConfigurationRegistry
-										.getInstance()
-										.getParameter(
-												urlCombo.getText(),
-												selectedOperation,
-												parm.getServiceSidedName());
-										final List<String> l = new LinkedList<String>();
-										for (final String a : selectedValueItems) {
-											l.add(a);
-										}
-
-										idvd = (IDiscreteValueDomain<String>) parm
-										.getValueDomain();
-										valueTree.setItemCount(idvd
-												.getPossibleValues().size());
-										int i = 0;
-										for (final Object s : idvd
-												.getPossibleValues()) {
-
-											if (l.contains(String.valueOf(s))) {
-												valueTree.getItem(i).setChecked(
-														true);
-											} else {
-												valueTree.getItem(i).setChecked(
-														false);
+								for (final Parameter parm : p) {
+									if (parm.getServiceSidedName().equals(selectedItem.getText())) {
+										if (parm.getValueDomain() instanceof IDiscreteValueDomain) {
+											final String[] selectedValueItems = SOSConfigurationRegistry
+													.getInstance().getParameter(
+															urlCombo.getText(),
+															selectedOperation,
+															parm.getServiceSidedName());
+											final List<String> l = new LinkedList<String>();
+											for (final String a : selectedValueItems) {
+												l.add(a);
 											}
-											valueTree.getItem(i++).setText(
-													String.valueOf(s));
+											idvd = (IDiscreteValueDomain<String>) parm.getValueDomain();
+											valueTree.setItemCount(idvd
+													.getPossibleValues().size());
+											int i = 0;
+											for (final Object s : idvd.getPossibleValues()) {
+
+												if (l.contains(String.valueOf(s))) {
+													valueTree.getItem(i)
+															.setChecked(true);
+												} else {
+													valueTree.getItem(i)
+															.setChecked(false);
+												}
+												valueTree.getItem(i++).setText(
+														String.valueOf(s));
+											}
 										}
 									}
 								}
-							}
-						} else {
-							omitTag.setEnabled(false);
-							valueTree.removeAll();
+							}else {
+								showTag.setEnabled(false);
+								valueBlock.setVisible(false);
 						}
-					}
-				} else {
+						}
+					
+				}else {
+					omitTag.setEnabled(false);
+					valueTree.removeAll();
+				}
+				}else {
 					showTag.setEnabled(false);
-					valueBlock.setVisible(false);
 				}
 			}
 
@@ -455,6 +513,7 @@ public class SOSPreferencePage1 extends PreferencePage implements
 							identifySelectedParameter(), values);
 				}
 			}
+
 		}
 		// buttonlistener
 		if (e.widget instanceof Button) {
@@ -476,14 +535,14 @@ public class SOSPreferencePage1 extends PreferencePage implements
 				}
 
 			} else if (b.equals(showTag)) {
-				if (identifySelectedOperation().equals(workarounds_s)){
+				if (GeneralConfigurationRegistry.getInstance().getWorkarounds().containsKey(identifySelectedOperation())){
 					SOSConfigurationRegistry.getInstance().setWorkaroundState(
-							urlCombo.getText(), identifySelectedParameter(),
+							urlCombo.getText(), identifySelectedOperation(),
 							b.getSelection());
-				} else{
+				} else {
 					SOSConfigurationRegistry.getInstance().setShowOperation(
 							urlCombo.getText(), identifySelectedOperation(),
-							b.getSelection());	
+							b.getSelection());
 				}
 			}
 
@@ -564,7 +623,16 @@ public class SOSPreferencePage1 extends PreferencePage implements
 
 		int j = 0;
 		for (IWorkaroundDescription w: workarounds){
-			workaroundItem.getItem(j++).setText(w.getIdentifier());
+			workaroundItem.getItem(j).setText(w.getIdentifier());
+			Param[] params = w.getParameters();
+			if (params != null && params.length > 0){
+				workaroundItem.getItem(j).setItemCount(params.length);
+				int k = 0;
+				for (Param p: params){
+					workaroundItem.getItem(j).getItem(k++).setText(p.key);
+				}
+			}
+			j++;
 		}
 
 		for (final OperationType op : caps.getOperations().getAllOperations()) {
@@ -622,7 +690,6 @@ public class SOSPreferencePage1 extends PreferencePage implements
 		for (final Parameter p : pc.getOptionalParameters()) {
 			pall.add(p.getServiceSidedName());
 		}
-
 		return pall;
 	}
 

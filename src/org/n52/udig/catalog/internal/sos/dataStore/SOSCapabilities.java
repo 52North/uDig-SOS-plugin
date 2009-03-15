@@ -76,7 +76,6 @@ import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Telephone;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -811,38 +810,67 @@ public class SOSCapabilities extends Capabilities {
 						}			
 					}
 
-					ReferencedEnvelope tempbbox = new ReferencedEnvelope(
-							oxfService.getContents().getDataIdentification(i)
-							.getBoundingBoxes()[0].getLowerCorner()[0],
-							oxfService.getContents().getDataIdentification(i)
-							.getBoundingBoxes()[0].getUpperCorner()[0],
-							oxfService.getContents().getDataIdentification(i)
-							.getBoundingBoxes()[0].getLowerCorner()[1],
-							oxfService.getContents().getDataIdentification(i)
-							.getBoundingBoxes()[0].getUpperCorner()[1],
-							CRS.decode(crs));
-
+					
+					ReferencedEnvelope tempbbox;
 					if (SOSConfigurationRegistry.getInstance().getWorkaroundState(serviceURL.toExternalForm(), EastingFirstWorkaroundDesc.identifier)){
-						EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
-						// OXFSamplingPointType umgedreht
-						
-						tempbbox = eastingFirstWorkaroundDesc.workaround(tempbbox); 
+//						tempbbox = EastingFirstWorkaroundDesc.workaround(tempbbox);
+						tempbbox = new ReferencedEnvelope(
+								oxfService.getContents().getDataIdentification(i)
+								.getBoundingBoxes()[0].getLowerCorner()[1],
+								oxfService.getContents().getDataIdentification(i)
+								.getBoundingBoxes()[0].getUpperCorner()[1],
+								oxfService.getContents().getDataIdentification(i)
+								.getBoundingBoxes()[0].getLowerCorner()[0],
+								oxfService.getContents().getDataIdentification(i)
+								.getBoundingBoxes()[0].getUpperCorner()[0],
+								CRS.decode(crs));
+						// WORKAROUND
+
+						tempbbox.expandToInclude(new Coordinate(
+								tempbbox.getMaxX() + 0.02,
+								tempbbox.getMaxY() + 0.02));
+						tempbbox.expandToInclude(new Coordinate(
+								tempbbox.getMinX() - 0.02,
+								tempbbox.getMinY() - 0.02));
+					} else{
+						tempbbox = new ReferencedEnvelope(
+								oxfService.getContents().getDataIdentification(i)
+								.getBoundingBoxes()[0].getLowerCorner()[0],
+								oxfService.getContents().getDataIdentification(i)
+								.getBoundingBoxes()[0].getUpperCorner()[0],
+								oxfService.getContents().getDataIdentification(i)
+								.getBoundingBoxes()[0].getLowerCorner()[1],
+								oxfService.getContents().getDataIdentification(i)
+								.getBoundingBoxes()[0].getUpperCorner()[1],
+								CRS.decode(crs));
+						tempbbox.expandToInclude(new Coordinate(
+								tempbbox.getMaxX() + 0.02,
+								tempbbox.getMaxY() + 0.02));
+						tempbbox.expandToInclude(new Coordinate(
+								tempbbox.getMinX() - 0.02,
+								tempbbox.getMinY() - 0.02));
 					}
-					
-					
+
 					if (SOSConfigurationRegistry.getInstance().getWorkaroundState(serviceURL.toExternalForm(), TransformCRSWorkaroundDesc.identifier)){
 						// WORKAROUND -> TRANSFORM CRS -> WGS84targetCRS
 						// TODO use parameters from settings
-						CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326");
-						TransformCRSWorkaroundDesc transformWorkaroundDesc = (TransformCRSWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(TransformCRSWorkaroundDesc.identifier);
-						tempbbox = transformWorkaroundDesc.workaround(tempbbox, targetCRS);
+//						TransformCRSWorkaroundDesc transformWorkaroundDesc = (TransformCRSWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(TransformCRSWorkaroundDesc.identifier);
+						
+						EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
+
+//						CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326");
+						CoordinateReferenceSystem targetCRS = CRS.decode(SOSConfigurationRegistry.getInstance().getWorkaroundParameter(
+								serviceURL.toExternalForm(),
+								EastingFirstWorkaroundDesc.identifier, 
+								eastingFirstWorkaroundDesc.getParameters()[0].key));
+						tempbbox = TransformCRSWorkaroundDesc.workaround(tempbbox, targetCRS);
 					}
 
 					if (SOSConfigurationRegistry.getInstance().getWorkaroundState(serviceURL.toExternalForm(), FalseBoundingBoxWorkaroundDesc.identifier)){
 						// WORKAROUND Change BBOX
 						// TODO use parameters from settings
-						FalseBoundingBoxWorkaroundDesc falseBBoxWorkaroundDesc = (FalseBoundingBoxWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(FalseBoundingBoxWorkaroundDesc.identifier);
-						tempbbox = falseBBoxWorkaroundDesc.workaround(tempbbox);
+//						FalseBoundingBoxWorkaroundDesc falseBBoxWorkaroundDesc = (FalseBoundingBoxWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(FalseBoundingBoxWorkaroundDesc.identifier);
+						tempbbox = FalseBoundingBoxWorkaroundDesc.workaround(tempbbox);
 					}
 
 					return tempbbox;

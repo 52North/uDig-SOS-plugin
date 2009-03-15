@@ -235,10 +235,9 @@ public class SOSGeoResourceImpl extends IGeoResource {
 				if (g != null) {
 					try {
 						if (SOSConfigurationRegistry.getInstance().getWorkaroundState(caps.getServiceURL().toExternalForm(), EastingFirstWorkaroundDesc.identifier)){
-							EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
+//							EastingFirstWorkaroundDesc eastingFirstWorkaroundDesc = (EastingFirstWorkaroundDesc)GeneralConfigurationRegistry.getInstance().getWorkarounds().get(EastingFirstWorkaroundDesc.identifier);
 							// OXFSamplingPointType umgedreht
-							
-							g = eastingFirstWorkaroundDesc.workaround(g); 
+							EastingFirstWorkaroundDesc .workaround(g); 
 						}
 						
 						// TODO change this to g.getSRID
@@ -247,7 +246,6 @@ public class SOSGeoResourceImpl extends IGeoResource {
 								new com.vividsolutions.jts.geom.Envelope(g
 										.getCoordinate()), CRS.decode(srid));
 						// WORKAROUND
-
 						bounds.expandToInclude(new Coordinate(
 								bounds.getMaxX() + 0.02,
 								bounds.getMaxY() + 0.02));
