@@ -1,63 +1,67 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by geheim (nixda) --><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sos="http://www.52n.org/schema/XMLConfigSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.52n.org/schema/XMLConfigSchema">
-<!-- Root Element-->
-<xs:element name="UDigSOSPlugin">
-<xs:annotation>
-<xs:documentation>Rootelement of UDigSOSPlugin configuration. Contains general configuration and multiple SOS configurations</xs:documentation>
-</xs:annotation>
-<xs:complexType>
-<xs:sequence>
-<xs:annotation>
-<xs:documentation>Element contains configured SOS</xs:documentation>
-</xs:annotation>
-<xs:complexType>
-<xs:sequence>
-<xs:element maxOccurs="unbounded" minOccurs="0" name="Operation">
-<xs:annotation>
-<xs:documentation>Operation element. Contains data of a configured SOS Operation. (i.e. GetObservation)</xs:documentation>
-</xs:annotation>
-<xs:complexType>
-<xs:sequence>
-<xs:element maxOccurs="unbounded" minOccurs="0" name="Parameter">
-<xs:annotation>
-<xs:documentation>Parameter-element. Servicename of the Parameter (i.e. observationID)</xs:documentation>
-</xs:annotation>
-<xs:complexType>
-<xs:sequence>
-<xs:element maxOccurs="unbounded" name="Value" type="xs:string">
-<xs:annotation>
-<xs:documentation>String representation of the parameters value, may have multiple values</xs:documentation>
-</xs:annotation>
-</xs:element>
-</xs:sequence>
-<xs:attribute name="id" use="required"><xs:annotation>
-<xs:documentation>
-The operations id (i.e. GetObservation)
-</xs:documentation>
-</xs:annotation></xs:attribute>
-<xs:attribute name="omit">
-<xs:annotation>
-<xs:documentation>If set to true: do not send parameter to SOS, false send to SOS</xs:documentation>
-</xs:annotation>
-</xs:attribute>
-</xs:complexType>
-</xs:element>
-</xs:sequence>
-<xs:attribute name="name" use="required"><xs:annotation>
-<xs:documentation>
-The Operations name (i.e. GetObservation
-</xs:documentation>
-</xs:annotation></xs:attribute>
-<xs:attribute name="showOperation"/>
-</xs:complexType>
-</xs:element>
-</xs:sequence>
-<xs:attribute name="url" use="required"><xs:annotation>
-<xs:documentation>
-The SOS' URL
-</xs:documentation>
-</xs:annotation></xs:attribute>
-</xs:complexType>
-</xs:sequence>
-</xs:complexType>
-</xs:element>
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sos="http://www.52n.org/schema/XMLConfigSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.52n.org/schema/XMLConfigSchema">
+	<xs:element name="UDigSOSPlugin">
+		<xs:annotation>
+			<xs:documentation>Rootelement of UDigSOSPlugin configuration. Contains general configuration and multiple SOS configurations</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="SOS" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Element contains configured SOS</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Operation" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Operation element. Name of a configured SOS Operation. (i.e. GetObservation)</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Parameter" minOccurs="0" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Parameter-element. Servicename of the Parameter (i.e. observationID)</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Value" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+												</xs:sequence>
+												<xs:attribute name="id" use="required"/>
+												<xs:attribute name="omit"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="name" use="required"/>
+									<xs:attribute name="showOperation"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Workaround" minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Workaround-element. Servicename of the Workaround (i.e. EPSG4326: Easting First)</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Parameter" minOccurs="0" maxOccurs="unbounded">
+											<xs:annotation>
+												<xs:documentation>Parameter-element. Servicename of the Parameter (i.e. CRS)</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="Value" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+												</xs:sequence>
+												<xs:attribute name="id" use="required"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="enabled" use="required"/>
+									<xs:attribute name="id" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="url" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>
