@@ -40,7 +40,7 @@ import org.n52.oxf.valueDomains.time.TimeFactory;
 import org.n52.udig.catalog.internal.sos.dataStore.OXFFeatureConverter;
 
 /**
- * @author Carsten Prieﬂ
+ * @author Carsten Priess
  * 
  */
 public class SOSAttributeType extends DefaultAttributeType {
