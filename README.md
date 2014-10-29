@@ -1,6 +1,6 @@
 # Important Information
 
-This project is discontinued. Hence support within the 52Â°North
+This project is discontinued. Hence support within the 52°North
 community might only be available to a limited degree.
 
 Feel free to fork the project and continue developments.
@@ -9,7 +9,7 @@ Feel free to fork the project and continue developments.
 
 The plugin has been tested with with uDig versions 1.1.RC14 and 1.1.SC3.
 
-# 52Â°North uDig Sensor Observation Plugin (SOS)
+# 52°North uDig Sensor Observation Plugin (SOS)
 
 uDig is a Desktop GIS written in Java and based on the eclipse platform.
 It is a free and open source software project driven by Refractions
